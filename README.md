@@ -1,4 +1,4 @@
-My groupmembers are:
+My group members are:
 - Trevor Corcoran
 - Stella Castro
 - Lily Winsor
