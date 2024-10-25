@@ -6,7 +6,6 @@ Description: The database class.
 """
 
 import pickle
-from tkinter import StringVar
 
 try:
     from src.Customer import Customer
@@ -22,16 +21,15 @@ class Database:
         self.customers = []
         self.prescriptions = []
 
-        self.current_user = StringVar()
-
     # CUSTOMER MANAGEMENT METHODS -----
-    def add_customer(self, first_name, last_name, username, password, email, phone_number, date_of_birth):
-        # Adds new customer to database
+    def add_customer(self, first_name, last_name, username, password, email, phone_number, date_of_birth) -> str:
+        """Adds new customer to database. Returns ID of new user"""
         new_customer = Customer(first_name, last_name, username, password, email, phone_number, date_of_birth)
         self.customers.append(new_customer)
+        return new_customer.ID
 
     def get_customer_by_ID(self, ID):
-        # Get customer object by ID. Returns None if no customer with ID exists.
+        """Get customer object by ID. Returns None if no customer with ID exists."""
         for customer in self.customers:
             if customer.ID == ID:
                 return customer
@@ -40,29 +38,31 @@ class Database:
 
     # PRESCRIPTION MANAGEMENT METHODS -----
     def add_prescription(self):
-        # Adds new prescription to database
+        """Adds new prescription to database"""
         # FIXME: Not implemented in sprint 1
         pass
 
     def save_customers(self):
-        # Save customers list to disk
+        """Save customers list to disk"""
         with open(CUSTOMER_FILE_NAME, "wb") as file:
             pickle.dump(self.customers, file)
 
     def save_prescriptions(self):
-        # Save prescriptions
+        """Save prescriptions"""
         # FIXME: Implement in later sprint. Likely just a trivial copy/paste of save_customers()
         pass
 
     def save_all(self):
-        # Save whole database to disk
+        """Save whole database to disk"""
         self.save_customers()
         self.save_prescriptions()
 
     def load(self):
+        """Loads saved data from disk"""
         with open(CUSTOMER_FILE_NAME, "rb") as file:
             self.customers = pickle.load(file)
         # FIXME: Add prescription loading
+        # FIXME: No error handling to check if files exist
 
     def __str__(self):
         result = "Customers (" + str(len(self.customers)) + ") " + "-" * 10 + "\n"

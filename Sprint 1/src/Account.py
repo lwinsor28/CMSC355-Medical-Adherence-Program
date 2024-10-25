@@ -13,14 +13,15 @@ except ImportError:
 
 
 class SignupWindow:
-    def __init__(self, database):
+    def __init__(self, database, current_user):
         # Open new window
         self.root = tk.Toplevel()
 
         # Database
         self.database = database
+        self.current_user = current_user
 
-        # Instance variables defined in other functions
+        # Frames defined in other functions
         self.main_frame = None
         self.left_frame = None
         self.right_frame = None
@@ -41,6 +42,10 @@ class SignupWindow:
         self.COL_WIDTH = 3
         self.ROW_PADX = 5
         self.ROW_PADY = 5
+
+        # Colors
+        self.DARK_GREY = "#b3b3b3"
+        self.LIGHT_GREY = "#e6e6e6"
 
         # Run all the functions that create the window
         self.init_root()
@@ -69,7 +74,7 @@ class SignupWindow:
 
     def init_frames(self):
         # Configure the main frame
-        self.main_frame = ttk.Frame(self.root, padding="3 3 12 12")
+        self.main_frame = tk.Frame(self.root, padx=3, pady=5)
         self.main_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
 
         # Allow frames within main frame to expand and fill space
@@ -94,7 +99,7 @@ class SignupWindow:
     def create_title_bar(self):
         # Show big title at the top of the window
         font = ('Magneto', 24)  # Goofy font bc why not
-        tk.Label(self.main_frame, text="Create New Account", font=font).grid(
+        tk.Label(self.main_frame, text="Create New Account", font=font, background=self.DARK_GREY).grid(
             column=0, row=0,
             columnspan=self.COL_WIDTH * 2, rowspan=1,
             padx=5, pady=0, sticky=(tk.N, tk.E, tk.W)
@@ -144,7 +149,7 @@ class SignupWindow:
             column=1, row=self.TOP_ROW + len(items),
             columnspan=1, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADY,
             sticky="W"
-            )
+        )
         # Generate labels
         phone_num_labels = ("-", "-")
         for idx in range(len(phone_num_labels)):
@@ -180,11 +185,30 @@ class SignupWindow:
         )
 
     def create_create_account_button(self):
-        tk.Button(self.main_frame, text="Create Account").grid(
+        tk.Button(self.main_frame, text="Create Account", command=self.click_create_account_button).grid(
             column=1, row=2,
             columnspan=self.COL_WIDTH * 2, rowspan=1,
             padx=5, pady=0, sticky=(tk.N, tk.E, tk.W)
         )
+
+    def click_create_account_button(self):
+        """Adds new account to database and closes the window."""
+        # FIXME: Does not validate user input nor do any error checking
+        new_ID = self.database.add_customer(
+            self.account_data["first_name"].get(),
+            self.account_data["last_name"].get(),
+            self.account_data["username"].get(),
+            self.account_data["password"].get(),
+            self.account_data["email"].get(),
+            self.account_data["phone_number"][0].get() +
+            self.account_data["phone_number"][1].get() +
+            self.account_data["phone_number"][2].get(),
+            self.account_data["date_of_birth"].get(),
+        )
+        self.current_user.set(new_ID)
+        print("On close user ID: " + self.current_user.get())
+        self.root.destroy()
+
 
 class LoginWindow:
     def __init__(self):
