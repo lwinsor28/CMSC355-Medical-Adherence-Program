@@ -5,7 +5,16 @@ Description: The database class.
              It holds a list of all customers and a list of all active prescriptions.
 """
 
-from src.Customer import Customer
+import pickle
+from tkinter import StringVar
+
+try:
+    from src.Customer import Customer
+except ImportError:
+    from Customer import Customer
+
+CUSTOMER_FILE_NAME = "customers.pkl"
+PRESCRIPTION_FILE_NAME = "prescriptions.pkl"
 
 
 class Database:
@@ -13,7 +22,7 @@ class Database:
         self.customers = []
         self.prescriptions = []
 
-        self.current_user = None
+        self.current_user = StringVar()
 
     # CUSTOMER MANAGEMENT METHODS -----
     def add_customer(self, first_name, last_name, username, password, email, phone_number, date_of_birth):
@@ -35,7 +44,52 @@ class Database:
         # FIXME: Not implemented in sprint 1
         pass
 
-    def save(self):
-        # Save database to disk
-        # FIXME: Do we want to implement this or just have it be all in RAM? - Trevor 2024/10/24
+    def save_customers(self):
+        # Save customers list to disk
+        with open(CUSTOMER_FILE_NAME, "wb") as file:
+            pickle.dump(self.customers, file)
+
+    def save_prescriptions(self):
+        # Save prescriptions
+        # FIXME: Implement in later sprint. Likely just a trivial copy/paste of save_customers()
         pass
+
+    def save_all(self):
+        # Save whole database to disk
+        self.save_customers()
+        self.save_prescriptions()
+
+    def load(self):
+        with open(CUSTOMER_FILE_NAME, "rb") as file:
+            self.customers = pickle.load(file)
+        # FIXME: Add prescription loading
+
+    def __str__(self):
+        result = "Customers (" + str(len(self.customers)) + ") " + "-" * 10 + "\n"
+        for customer in self.customers:
+            result += " - " + str(customer) + "\n"
+        # FIXME: Implement prescriptions here if desired
+        return result
+
+
+if __name__ == "__main__":
+    # Quick sanity test
+    # The following is only execute if this exact file is run by itself
+    import datetime
+
+    db = Database()
+    dob1 = datetime.date.fromisoformat("1989-12-07")
+    dob2 = datetime.date.fromisoformat("2018-06-01")
+    db.add_customer("Satoru", "Gojo", "thestr0ngest", "hollow&purple1989",
+                    "satorugojo@jjhs.edu", "5551234567", dob1)
+    db.add_customer("Sukuna", "Ryoumen", "kingofcurses", "20fingers",
+                    "imhim@malevolentshrine.lol", "5556666666", dob2)
+    db.save_all()
+
+    db2 = Database()
+    db2.load()
+
+    if str(db) == str(db2):
+        print("Save/load test successful")
+    else:
+        print("Save/load test unsuccessful")
