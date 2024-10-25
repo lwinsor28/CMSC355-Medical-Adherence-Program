@@ -6,7 +6,7 @@ Assignment: Sprint 1
 Date: 2024/11/1
 """
 
-from src.app import App
+from src.App import App
 
 # Import shenanigans necessary to ensure cross-platform compatibility
 try:
