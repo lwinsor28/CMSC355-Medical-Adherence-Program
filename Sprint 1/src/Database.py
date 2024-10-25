@@ -5,7 +5,7 @@ Description: The database class.
              It holds a list of all customers and a list of all active prescriptions.
 """
 
-import Customer
+from src.Customer import Customer
 
 
 class Database:
@@ -13,10 +13,12 @@ class Database:
         self.customers = []
         self.prescriptions = []
 
+        self.current_user = None
+
     # CUSTOMER MANAGEMENT METHODS -----
-    def add_customer(self, first_name, last_name, username, password, email, phone_number):
+    def add_customer(self, first_name, last_name, username, password, email, phone_number, date_of_birth):
         # Adds new customer to database
-        new_customer = Customer(first_name, last_name, username, password, email, phone_number)
+        new_customer = Customer(first_name, last_name, username, password, email, phone_number, date_of_birth)
         self.customers.append(new_customer)
 
     def get_customer_by_ID(self, ID):
