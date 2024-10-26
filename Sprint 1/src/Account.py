@@ -10,6 +10,10 @@ try:
 except ImportError:
     import Tkinter as tk
     import ttk
+from datetime import date
+
+TITLE_FONT = ('Magneto', 24)  # Goofy font bc why not
+NO_USER_MSG = "No User Found"
 
 
 class SignupWindow:
@@ -28,13 +32,13 @@ class SignupWindow:
 
         # Account creation variables
         self.account_data = {
-            "first_name": tk.StringVar(),
-            "last_name": tk.StringVar(),
-            "date_of_birth": tk.StringVar(),
-            "username": tk.StringVar(),
-            "password": tk.StringVar(),
-            "email": tk.StringVar(),
-            "phone_number": [tk.StringVar(), tk.StringVar(), tk.StringVar()],
+            "first_name": tk.Entry(),
+            "last_name": tk.Entry(),
+            "date_of_birth": tk.Entry(),
+            "username": tk.Entry(),
+            "password": tk.Entry(),
+            "email": tk.Entry(),
+            "phone_number": [tk.Entry(), tk.Entry(), tk.Entry()],
         }
 
         # Grid constants
@@ -56,7 +60,7 @@ class SignupWindow:
         self.create_create_account_button()
 
     def init_root(self):
-        # Configure any window elements such as title, size, etc.
+        """Configure any window elements such as title, size, etc."""
 
         self.root.title('Account Creation: Medical Adherence Software - Group 7')  # Window title
 
@@ -73,6 +77,7 @@ class SignupWindow:
         self.root.iconphoto(False, logo)
 
     def init_frames(self):
+        """Configure the main content frames of the window."""
         # Configure the main frame
         self.main_frame = tk.Frame(self.root, padx=3, pady=5)
         self.main_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
@@ -97,22 +102,22 @@ class SignupWindow:
         self.right_frame.columnconfigure(0, weight=2)
 
     def create_title_bar(self):
-        # Show big title at the top of the window
+        """Show big title at the top of the window"""
         font = ('Magneto', 24)  # Goofy font bc why not
-        tk.Label(self.main_frame, text="Create New Account", font=font, background=self.DARK_GREY).grid(
+        tk.Label(self.main_frame, text="Create New Account", font=TITLE_FONT, background=self.DARK_GREY).grid(
             column=0, row=0,
             columnspan=self.COL_WIDTH * 2, rowspan=1,
             padx=5, pady=0, sticky=(tk.N, tk.E, tk.W)
         )
 
     def create_left_column(self):
-        # Load items in the left column
+        """Load items in the left column"""
 
         # List that allows for an easy for loop to write out the whole left column.
         # For each individual element e, e[0] = display name, e[1] equivalent variable name for self.account_data
         items = (
             ("First Name", "first_name"),
-            ("Date of Birth", "date_of_birth"),
+            ("Date of Birth\n(YYYY-MM-DD)", "date_of_birth"),
             ("Username", "username"),
             ("Password", "password"),
             ("Email", "email"),
@@ -124,12 +129,12 @@ class SignupWindow:
 
             tk.Label(self.left_frame, text=item[0]).grid(
                 column=0, row=self.TOP_ROW + idx,
-                columnspan=1, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADX
+                columnspan=1, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADY
             )
             self.account_data[item[1]] = tk.Entry(self.left_frame)
             self.account_data[item[1]].grid(
                 column=1, row=self.TOP_ROW + idx,
-                columnspan=5, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADX,
+                columnspan=5, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADY,
                 sticky="W"
             )
 
@@ -141,7 +146,7 @@ class SignupWindow:
         # Initial label
         tk.Label(self.left_frame, text="Phone Number").grid(
             column=0, row=self.TOP_ROW + len(items),
-            columnspan=1, rowspan=1, padx=0, pady=self.ROW_PADX
+            columnspan=1, rowspan=1, padx=0, pady=self.ROW_PADY
         )
         # It gets its own frame to not ruin the other rows with its complexity
         phone_num_entry_frame = tk.Frame(self.left_frame)
@@ -155,7 +160,7 @@ class SignupWindow:
         for idx in range(len(phone_num_labels)):
             tk.Label(phone_num_entry_frame, text=phone_num_labels[idx]).grid(
                 column=(idx * 2) + 1, row=0,
-                columnspan=1, rowspan=1, padx=0, pady=self.ROW_PADX
+                columnspan=1, rowspan=1, padx=0, pady=self.ROW_PADY
             )
         # Generate text boxes
         phone_num_widths = (3, 3, 4)
@@ -165,22 +170,22 @@ class SignupWindow:
             )
             self.account_data["phone_number"][idx].grid(
                 column=(idx * 2) + 0, row=0,
-                columnspan=1, rowspan=1, padx=0, pady=self.ROW_PADX,
+                columnspan=1, rowspan=1, padx=0, pady=self.ROW_PADY,
                 sticky="W"
             )
 
     def create_right_column(self):
-        # Load items in the right column
+        """Load items in the right column"""
 
         # Last name
         tk.Label(self.right_frame, text="Last Name").grid(
             column=0, row=self.TOP_ROW + 0,
-            columnspan=1, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADX
+            columnspan=1, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADY
         )
         self.account_data["last_name"] = tk.Entry(self.right_frame)
         self.account_data["last_name"].grid(
             column=1, row=self.TOP_ROW + 0,
-            columnspan=2, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADX,
+            columnspan=2, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADY,
             sticky="W"
         )
 
@@ -203,9 +208,10 @@ class SignupWindow:
             self.account_data["phone_number"][0].get() +
             self.account_data["phone_number"][1].get() +
             self.account_data["phone_number"][2].get(),
-            self.account_data["date_of_birth"].get(),
+            date.fromisoformat(self.account_data["date_of_birth"].get()),
         )
-        self.current_user.set(new_ID)
+        self.current_user.set(str(self.database.get_customer_by_ID(new_ID)))
+        # self.current_user.set(new_ID) Ideally should store just ID, but this is temporary
         self.root.destroy()
 
 
@@ -223,20 +229,15 @@ class LoginWindow:
 
         # Account creation variables
         self.account_data = {
-            "first_name": tk.StringVar(),
-            "last_name": tk.StringVar(),
-            "date_of_birth": tk.StringVar(),
             "username": tk.StringVar(),
             "password": tk.StringVar(),
-            "email": tk.StringVar(),
-            "phone_number": [tk.StringVar(), tk.StringVar(), tk.StringVar()],
         }
 
         # Grid constants
         self.TOP_ROW = 1
         self.COL_WIDTH = 3
         self.ROW_PADX = 5
-        self.ROW_PADY = 5
+        self.ROW_PADY = 10
 
         # Colors
         self.DARK_GREY = "#b3b3b3"
@@ -244,9 +245,12 @@ class LoginWindow:
         # Run all the functions that create the window
         self.init_root()
         self.init_frames()
+        self.create_title_bar()
+        self.create_login_entries()
+        self.create_login_button()
 
     def init_root(self):
-        # Configure any window elements such as title, size, etc.
+        """Configure any window elements such as title, size, etc."""
 
         self.root.title('Login: Medical Adherence Software - Group 7')  # Window title
 
@@ -255,7 +259,7 @@ class LoginWindow:
         self.root.rowconfigure(0, weight=1)
 
         # Window size
-        self.root.geometry('450x300')
+        self.root.geometry('450x150')
         self.root.resizable(width=False, height=False)
 
         # Window Logo
@@ -263,6 +267,69 @@ class LoginWindow:
         self.root.iconphoto(False, logo)
 
     def init_frames(self):
-        # Configure the main frame
+        """Configure the main frame"""
         self.main_frame = tk.Frame(self.root, padx=3, pady=5)
         self.main_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+
+        # Allow columns to fill space
+        for col in range(self.COL_WIDTH * 2):
+            self.main_frame.columnconfigure(col, weight=1)
+
+        # Login button fills vertical space
+        self.main_frame.rowconfigure(self.TOP_ROW + 1, weight=1)
+
+    def create_title_bar(self):
+        """Show big title at the top of the window"""
+        tk.Label(self.main_frame, text="Login", font=TITLE_FONT, background=self.DARK_GREY).grid(
+            column=0, row=self.TOP_ROW - 1,
+            columnspan=self.COL_WIDTH * 2, rowspan=1,
+            padx=5, pady=0, sticky=(tk.N, tk.E, tk.W)
+        )
+
+    def create_login_entries(self):
+        """Create labels and entries for login information"""
+        items = (
+            ("Username:", "username"),
+            ("Password:", "password")
+        )
+
+        for idx in range(len(items)):
+            item = items[idx]
+            tk.Label(self.main_frame, text=[item[0]]).grid(
+                column=idx * self.COL_WIDTH, row=self.TOP_ROW + 0,
+                columnspan=1, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADY
+            )
+            self.account_data[item[1]] = tk.Entry(self.main_frame)
+            self.account_data[item[1]].grid(
+                column=(idx * self.COL_WIDTH) + 1, row=self.TOP_ROW + 0,
+                columnspan=2, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADY,
+                sticky="W"
+            )
+
+            # Enable password mode for the password box
+            if item[1] == "password":
+                self.account_data[item[1]]["show"] = "*"
+
+    def create_login_button(self):
+        tk.Button(self.main_frame, text="Login", command=self.click_login_button).grid(
+            column=4, row=self.TOP_ROW + 1,
+            columnspan=2, rowspan=2,
+            padx=5, pady=5, sticky=(tk.S, tk.E, tk.W)
+        )
+
+    def click_login_button(self):
+        """Find user that matches username and password, then set them as active user."""
+        # FIXME: Does not warn user if login info is invalid
+
+        result = self.database.get_customer_by_username_password(
+            self.account_data["username"].get(),
+            self.account_data["password"].get()
+        )
+
+        if result is None:
+            self.current_user.set(NO_USER_MSG)
+        else:
+            self.current_user.set(str(self.database.get_customer_by_ID(result.ID)))
+            # self.current_user.set(result.ID) Ideally should store just ID, but this is temporary
+
+        self.root.destroy()

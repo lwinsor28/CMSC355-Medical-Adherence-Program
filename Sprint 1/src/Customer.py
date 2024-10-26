@@ -23,8 +23,10 @@ class Customer:
         self.ID = uuid.uuid4()  # Random ID to discern between customers with identical names, email, etc.
 
     def __str__(self):
-        return "{0} {1}, {2}, {3}, {4}, {5}, {6}, {7}".format(
-            self.first_name, self.last_name, self.username,
-            self.password, self.email, self.phone_number,
-            str(self.date_of_birth), self.ID
+        return "Name: {0} {1},\nUsername/Password: {2}, {3},\nEmail/Phone: {4}, {5},\nBirthdate: {6},\nID: {7}".format(
+            self.first_name, self.last_name,
+            self.username, self.password,
+            self.email, self.phone_number,
+            str(self.date_of_birth),
+            self.ID
         )

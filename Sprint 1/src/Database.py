@@ -36,6 +36,14 @@ class Database:
 
         return None
 
+    def get_customer_by_username_password(self, username, password):
+        """Get customer object by matching username and password. Returns None if no matching customer exists."""
+        for customer in self.customers:
+            if (customer.username == username) and (customer.password == password):
+                return customer
+
+        return None
+
     # PRESCRIPTION MANAGEMENT METHODS -----
     def add_prescription(self):
         """Adds new prescription to database"""

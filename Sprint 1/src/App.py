@@ -41,6 +41,13 @@ class App:
         self.create_account_buttons()
         self.create_current_user_label()
 
+        # Temporary database default users -----------------------------------------------------------------------
+        import datetime
+        self.database.add_customer("Satoru", "Gojo", "thestr0ngest", "hollow&purple1989",
+                        "satorugojo@jjhs.edu", "5551234567", datetime.date.fromisoformat("1989-12-07"))
+        self.database.add_customer("Sukuna", "Ryoumen", "kingofcurses", "20fingers",
+                        "imhim@malevolentshrine.lol", "5556666666", datetime.date.fromisoformat("2018-06-01"))
+
     def init_root(self):
         """Configure any window elements such as title, size, etc.
         # Basically anything that isn't the *actual* application."""
@@ -80,7 +87,7 @@ class App:
         label_frame.grid(column=1, row=2, padx=5, pady=5, columnspan=4, sticky=(tk.N, tk.S, tk.E, tk.W))
         label_frame.columnconfigure(1, weight=1)
         label_frame.columnconfigure(2, weight=1)
-        user_label1 = tk.Label(label_frame, text="Current User ID: ")
+        user_label1 = tk.Label(label_frame, text="Current User: ")
         user_label1.grid(column=1, row=1, sticky=(tk.N, tk.S, tk.E))
         user_label2 = tk.Label(label_frame, textvariable=self.current_user)
         user_label2.grid(column=2, row=1, columnspan=3, sticky=(tk.N, tk.S, tk.W))
