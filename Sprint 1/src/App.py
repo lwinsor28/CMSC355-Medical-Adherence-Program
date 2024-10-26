@@ -41,12 +41,7 @@ class App:
         self.create_account_buttons()
         self.create_current_user_label()
 
-        # Temporary database default users -----------------------------------------------------------------------
-        import datetime
-        self.database.add_customer("Satoru", "Gojo", "thestr0ngest", "hollow&purple1989",
-                        "satorugojo@jjhs.edu", "5551234567", datetime.date.fromisoformat("1989-12-07"))
-        self.database.add_customer("Sukuna", "Ryoumen", "kingofcurses", "20fingers",
-                        "imhim@malevolentshrine.lol", "5556666666", datetime.date.fromisoformat("2018-06-01"))
+        self.load_database()
 
     def init_root(self):
         """Configure any window elements such as title, size, etc.
@@ -99,3 +94,20 @@ class App:
 
     def click_log_in_button(self):
         LoginWindow(self.database, self.current_user)
+
+    def load_database(self):
+        """Loads previous database. Otherwise, loads in defaults."""
+        try:
+            self.database.load()
+        except:
+            print("Problem loading database. Creating new database and inserting defaults...")
+            # No file was loaded. Let's load some defaults!
+            from datetime import date
+            # Default users
+            self.database.add_customer("Satoru", "Gojo", "thestr0ngest", "hollow&purple1989",
+                                       "satorugojo@jjhs.edu", "5551234567", date.fromisoformat("1989-12-07"))
+            self.database.add_customer("Sukuna", "Ryoumen", "kingofcurses", "20fingers",
+                                       "imhim@malevolentshrine.lol", "5556666666",
+                                       date.fromisoformat("2018-06-01"))
+            # Save
+            self.database.save_all()

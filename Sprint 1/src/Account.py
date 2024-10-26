@@ -212,6 +212,7 @@ class SignupWindow:
         )
         self.current_user.set(str(self.database.get_customer_by_ID(new_ID)))
         # self.current_user.set(new_ID) Ideally should store just ID, but this is temporary
+        self.database.save_customers()
         self.root.destroy()
 
 

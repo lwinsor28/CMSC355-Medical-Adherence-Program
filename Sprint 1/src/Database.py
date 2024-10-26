@@ -12,14 +12,14 @@ try:
 except ImportError:
     from Customer import Customer
 
-CUSTOMER_FILE_NAME = "customers.pkl"
-PRESCRIPTION_FILE_NAME = "prescriptions.pkl"
-
 
 class Database:
     def __init__(self):
         self.customers = []
         self.prescriptions = []
+
+        self.CUSTOMER_FILE_NAME = "customers.pkl"
+        self.PRESCRIPTION_FILE_NAME = "prescriptions.pkl"
 
     # CUSTOMER MANAGEMENT METHODS -----
     def add_customer(self, first_name, last_name, username, password, email, phone_number, date_of_birth) -> str:
@@ -52,7 +52,7 @@ class Database:
 
     def save_customers(self):
         """Save customers list to disk"""
-        with open(CUSTOMER_FILE_NAME, "wb") as file:
+        with open(self.CUSTOMER_FILE_NAME, "wb") as file:
             pickle.dump(self.customers, file)
 
     def save_prescriptions(self):
@@ -67,7 +67,7 @@ class Database:
 
     def load(self):
         """Loads saved data from disk"""
-        with open(CUSTOMER_FILE_NAME, "rb") as file:
+        with open(self.CUSTOMER_FILE_NAME, "rb") as file:
             self.customers = pickle.load(file)
         # FIXME: Add prescription loading
         # FIXME: No error handling to check if files exist
