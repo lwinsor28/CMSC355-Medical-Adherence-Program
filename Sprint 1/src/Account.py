@@ -206,10 +206,63 @@ class SignupWindow:
             self.account_data["date_of_birth"].get(),
         )
         self.current_user.set(new_ID)
-        print("On close user ID: " + self.current_user.get())
         self.root.destroy()
 
 
 class LoginWindow:
-    def __init__(self):
-        print("Not implemented yet")
+    def __init__(self, database, current_user):
+        # Open new window
+        self.root = tk.Toplevel()
+
+        # Database
+        self.database = database
+        self.current_user = current_user
+
+        # Frames defined in other functions
+        self.main_frame = None
+
+        # Account creation variables
+        self.account_data = {
+            "first_name": tk.StringVar(),
+            "last_name": tk.StringVar(),
+            "date_of_birth": tk.StringVar(),
+            "username": tk.StringVar(),
+            "password": tk.StringVar(),
+            "email": tk.StringVar(),
+            "phone_number": [tk.StringVar(), tk.StringVar(), tk.StringVar()],
+        }
+
+        # Grid constants
+        self.TOP_ROW = 1
+        self.COL_WIDTH = 3
+        self.ROW_PADX = 5
+        self.ROW_PADY = 5
+
+        # Colors
+        self.DARK_GREY = "#b3b3b3"
+
+        # Run all the functions that create the window
+        self.init_root()
+        self.init_frames()
+
+    def init_root(self):
+        # Configure any window elements such as title, size, etc.
+
+        self.root.title('Login: Medical Adherence Software - Group 7')  # Window title
+
+        # Configure the root so that it does not interfere with the main_frame grid layout
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
+
+        # Window size
+        self.root.geometry('450x300')
+        self.root.resizable(width=False, height=False)
+
+        # Window Logo
+        logo = tk.PhotoImage(file='./assets/medical_icon.png')
+        self.root.iconphoto(False, logo)
+
+    def init_frames(self):
+        # Configure the main frame
+        self.main_frame = tk.Frame(self.root, padx=3, pady=5)
+        self.main_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
