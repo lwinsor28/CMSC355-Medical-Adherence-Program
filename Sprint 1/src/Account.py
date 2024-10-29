@@ -1,6 +1,6 @@
 """
 Name: Account.py
-Description: The account creation window.
+Description: The account creation and login windows are loaded from here.
 """
 
 # Import shenanigans necessary to ensure cross-platform compatibility
@@ -332,5 +332,7 @@ class LoginWindow:
         else:
             self.current_user.set(str(self.database.get_customer_by_ID(result.ID)))
             # self.current_user.set(result.ID) Ideally should store just ID, but this is temporary
+            # Right now it stores the whole customer object cast to a string so it can display all information
+            # on the main page.
 
         self.root.destroy()
