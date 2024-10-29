@@ -19,6 +19,7 @@ This repo contains code for a medical adherence software. This software will tra
 
 ### Requirements
 * Tested by one member with **Python 3.11**
+* Tested by one member with **Python 3.12**
 
 ### Sprint 1 Demo Images
 ![New Account Window](./Sprint%201/assets/demo1.png)
