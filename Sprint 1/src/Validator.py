@@ -16,8 +16,10 @@ The way this class should be used is the following:
 Feel free to add a new validation function into the class if necessary.
 """
 
-from Database import Database
 import re
+
+from src.Database import Database
+from src.Alert import AlertWindow
 
 
 class Validator:
@@ -38,8 +40,11 @@ class Validator:
 
         # All is not good
         else:
+            alert_message = ""
             for message in self._failed_cases:
+                alert_message += message + "\n"
                 print(message)  # FIXME: Make it open an alert window
+            AlertWindow(alert_message)
 
             return False
 

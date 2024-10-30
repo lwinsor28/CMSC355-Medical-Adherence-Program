@@ -15,6 +15,7 @@ except ImportError:
 try:
     from src.Account import SignupWindow, LoginWindow
     from src.Database import Database
+    from src.Alert import AlertWindow
 except ImportError:
     print("Big problem boss. Imports ain't importing.")  # Hopefully impossible
     quit()
