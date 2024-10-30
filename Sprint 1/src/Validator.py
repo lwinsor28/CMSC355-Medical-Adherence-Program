@@ -153,13 +153,11 @@ class Validator:
 
 """Some manual testing of test cases is performed here if this file is run by itself."""
 if __name__ == "__main__":
-    import datetime
 
     # Fake database
     db = Database()
-    dob1 = datetime.date.fromisoformat("1989-12-07")
     db.add_customer("Satoru", "Gojo", "thestr0ngest", "hollow&purple1989",
-                    "satorugojo@jjhs.edu", "5551234567", dob1)
+                    "satorugojo@jjhs.edu", "5551234567")
 
     # check_username_does_not_exist
     v = Validator()

@@ -121,7 +121,6 @@ class SignupWindow:
         # For each individual element e, e[0] = display name, e[1] equivalent variable name for self.account_data
         items = (
             ("First Name", "first_name"),
-            ("Date of Birth\n(YYYY-MM-DD)", "date_of_birth"),
             ("Username", "username"),
             ("Password", "password"),
             ("Email", "email"),
@@ -201,7 +200,8 @@ class SignupWindow:
         )
 
     def click_create_account_button(self):
-        """Adds new account to database and closes the window."""
+        """Adds new account to database and closes the window.
+        Checks to make sure no issues exist with user input"""
         # FIXME: Does not validate user input nor do any error checking
         new_ID = self.database.add_customer(
             self.account_data["first_name"].get(),
@@ -212,7 +212,6 @@ class SignupWindow:
             self.account_data["phone_number"][0].get() +
             self.account_data["phone_number"][1].get() +
             self.account_data["phone_number"][2].get(),
-            date.fromisoformat(self.account_data["date_of_birth"].get()),
         )
         self.current_user.set(str(self.database.get_customer_by_ID(new_ID)))
         # self.current_user.set(new_ID) Ideally should store just ID, but this is temporary
@@ -300,7 +299,7 @@ class LoginWindow:
 
         for idx in range(len(items)):
             item = items[idx]
-            tk.Label(self.main_frame, text=[item[0]]).grid(
+            tk.Label(self.main_frame, text=item[0]).grid(
                 column=idx * self.COL_WIDTH, row=self.TOP_ROW + 0,
                 columnspan=1, rowspan=1, padx=self.ROW_PADX, pady=self.ROW_PADY
             )
@@ -323,15 +322,14 @@ class LoginWindow:
         )
 
     def click_login_button(self):
-        """Find user that matches username and password, then set them as active user."""
-        # FIXME: Does not warn user if login info is invalid
+        """Find user that matches username and password, then set them as active user.
+        If issues arise, show an alert popup that explain what went wrong"""
 
-        # Validation setup
-        validator = Validator()
         username = self.account_data["username"].get()
         password = self.account_data["password"].get()
 
         # Run validation checks
+        validator = Validator()
         validator.check_username_exists(username, self.database)
         validator.check_username_password_match(username, password, self.database)
 
