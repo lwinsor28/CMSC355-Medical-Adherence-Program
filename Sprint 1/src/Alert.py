@@ -11,6 +11,7 @@ except ImportError:
     import Tkinter as tk
     import ttk
 
+
 class AlertWindow:
     def __init__(self, message):
         # Open new window

@@ -10,7 +10,6 @@ try:
 except ImportError:
     import Tkinter as tk
     import ttk
-from datetime import date
 
 try:
     from src.Validator import Validator
@@ -84,7 +83,7 @@ class SignupWindow:
         """Configure the main content frames of the window."""
         # Configure the main frame
         self.main_frame = tk.Frame(self.root, padx=3, pady=5)
-        self.main_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+        self.main_frame.grid(column=0, row=0, sticky="NSEW")
 
         # Allow frames within main frame to expand and fill space
         self.main_frame.columnconfigure(0, weight=1)
@@ -93,25 +92,24 @@ class SignupWindow:
 
         # Configure the left column frame
         self.left_frame = tk.Frame(self.main_frame)
-        self.left_frame.grid(column=0, row=1, sticky=(tk.N, tk.S, tk.E, tk.W),
+        self.left_frame.grid(column=0, row=1, sticky="NSEW",
                              columnspan=1)
         self.left_frame.columnconfigure(1, weight=3)
         self.left_frame.columnconfigure(0, weight=1)
 
         # Configure the right column frame
         self.right_frame = tk.Frame(self.main_frame)
-        self.right_frame.grid(column=1, row=1, sticky=(tk.N, tk.S, tk.E, tk.W),
+        self.right_frame.grid(column=1, row=1, sticky="NSEW",
                               columnspan=1)
         self.right_frame.columnconfigure(1, weight=1)
         self.right_frame.columnconfigure(0, weight=2)
 
     def create_title_bar(self):
         """Show big title at the top of the window"""
-        font = ('Magneto', 24)  # Goofy font bc why not
         tk.Label(self.main_frame, text="Create New Account", font=TITLE_FONT, background=self.DARK_GREY).grid(
             column=0, row=0,
             columnspan=self.COL_WIDTH * 2, rowspan=1,
-            padx=5, pady=0, sticky=(tk.N, tk.E, tk.W)
+            padx=5, pady=0, sticky="NEW"
         )
 
     def create_left_column(self):
@@ -196,7 +194,7 @@ class SignupWindow:
         tk.Button(self.main_frame, text="Create Account", command=self.click_create_account_button).grid(
             column=1, row=2,
             columnspan=self.COL_WIDTH * 2, rowspan=1,
-            padx=5, pady=0, sticky=(tk.N, tk.E, tk.W)
+            padx=5, pady=0, sticky="NEW"
         )
 
     def click_create_account_button(self):
@@ -285,7 +283,7 @@ class LoginWindow:
     def init_frames(self):
         """Configure the main frame"""
         self.main_frame = tk.Frame(self.root, padx=3, pady=5)
-        self.main_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+        self.main_frame.grid(column=0, row=0, sticky="NSEW")
 
         # Allow columns to fill space
         for col in range(self.COL_WIDTH * 2):
@@ -299,7 +297,7 @@ class LoginWindow:
         tk.Label(self.main_frame, text="Login", font=TITLE_FONT, background=self.DARK_GREY).grid(
             column=0, row=self.TOP_ROW - 1,
             columnspan=self.COL_WIDTH * 2, rowspan=1,
-            padx=5, pady=0, sticky=(tk.N, tk.E, tk.W)
+            padx=5, pady=0, sticky="NEW"
         )
 
     def create_login_entries(self):
@@ -330,20 +328,18 @@ class LoginWindow:
         tk.Button(self.main_frame, text="Login", command=self.click_login_button).grid(
             column=4, row=self.TOP_ROW + 1,
             columnspan=2, rowspan=2,
-            padx=5, pady=5, sticky=(tk.S, tk.E, tk.W)
+            padx=5, pady=5, sticky="SEW"
         )
 
     def click_login_button(self):
         """Find user that matches username and password, then set them as active user.
         If issues arise, show an alert popup that explain what went wrong"""
 
-        username = self.account_data["username"].get()
-        password = self.account_data["password"].get()
-
         # Run validation checks
         validator = Validator()
-        validator.check_username_exists(username, self.database)  # TC06
-        validator.check_username_password_match(username, password, self.database)  # TC07
+        validator.check_username_exists(self.account_data["username"].get(), self.database)  # TC06
+        validator.check_username_password_match(self.account_data["username"].get(),
+                                                self.account_data["password"].get(), self.database)  # TC07
 
         # Continue with login process if no validation failures occured
         if validator.no_failures():
