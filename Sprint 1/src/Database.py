@@ -22,9 +22,9 @@ class Database:
         self.PRESCRIPTION_FILE_NAME = "prescriptions.pkl"
 
     # CUSTOMER MANAGEMENT METHODS -----
-    def add_customer(self, first_name, last_name, username, password, email, phone_number, date_of_birth) -> str:
+    def add_customer(self, first_name, last_name, username, password, email, phone_number) -> str:
         """Adds new customer to database. Returns ID of new user"""
-        new_customer = Customer(first_name, last_name, username, password, email, phone_number, date_of_birth)
+        new_customer = Customer(first_name, last_name, username, password, email, phone_number)
         self.customers.append(new_customer)
         return new_customer.ID
 
@@ -83,15 +83,11 @@ class Database:
 if __name__ == "__main__":
     # Quick sanity test
     # The following is only execute if this exact file is run by itself
-    import datetime
-
     db = Database()
-    dob1 = datetime.date.fromisoformat("1989-12-07")
-    dob2 = datetime.date.fromisoformat("2018-06-01")
     db.add_customer("Satoru", "Gojo", "thestr0ngest", "hollow&purple1989",
-                    "satorugojo@jjhs.edu", "5551234567", dob1)
+                    "satorugojo@jjhs.edu", "5551234567")
     db.add_customer("Sukuna", "Ryoumen", "kingofcurses", "20fingers",
-                    "imhim@malevolentshrine.lol", "5556666666", dob2)
+                    "imhim@malevolentshrine.lol", "5556666666")
     db.save_all()
 
     db2 = Database()
