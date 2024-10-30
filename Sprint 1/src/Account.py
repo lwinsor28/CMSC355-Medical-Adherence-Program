@@ -202,21 +202,33 @@ class SignupWindow:
     def click_create_account_button(self):
         """Adds new account to database and closes the window.
         Checks to make sure no issues exist with user input"""
-        # FIXME: Does not validate user input nor do any error checking
-        new_ID = self.database.add_customer(
-            self.account_data["first_name"].get(),
-            self.account_data["last_name"].get(),
-            self.account_data["username"].get(),
-            self.account_data["password"].get(),
-            self.account_data["email"].get(),
-            self.account_data["phone_number"][0].get() +
-            self.account_data["phone_number"][1].get() +
-            self.account_data["phone_number"][2].get(),
-        )
-        self.current_user.set(str(self.database.get_customer_by_ID(new_ID)))
-        # self.current_user.set(new_ID) Ideally should store just ID, but this is temporary
-        self.database.save_customers()
-        self.root.destroy()
+
+        # Validation checks
+        validator = Validator()
+        validator.check_username_does_not_exist(self.account_data["username"].get(), self.database)  # TC02
+        validator.check_valid_email_format(self.account_data["email"].get())  # TC03
+        validator.check_valid_password_format(self.account_data["password"].get())  # TC04
+
+        # Check that no validation checks failed
+        if validator.no_failures():
+            new_ID = self.database.add_customer(
+                self.account_data["first_name"].get(),
+                self.account_data["last_name"].get(),
+                self.account_data["username"].get(),
+                self.account_data["password"].get(),
+                self.account_data["email"].get(),
+                self.account_data["phone_number"][0].get() +
+                self.account_data["phone_number"][1].get() +
+                self.account_data["phone_number"][2].get(),
+            )
+            self.current_user.set(str(self.database.get_customer_by_ID(new_ID)))
+            # self.current_user.set(new_ID) Ideally should store just ID, but this is temporary
+            self.database.save_customers()
+            self.root.destroy()
+
+        # Validation checks failed, show errors
+        else:
+            validator.display_failures()
 
 
 class LoginWindow:
@@ -330,8 +342,8 @@ class LoginWindow:
 
         # Run validation checks
         validator = Validator()
-        validator.check_username_exists(username, self.database)
-        validator.check_username_password_match(username, password, self.database)
+        validator.check_username_exists(username, self.database)  # TC06
+        validator.check_username_password_match(username, password, self.database)  # TC07
 
         # Continue with login process if no validation failures occured
         if validator.no_failures():
