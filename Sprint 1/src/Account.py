@@ -12,8 +12,12 @@ except ImportError:
     import ttk
 from datetime import date
 
+try:
+    from src.Validator import Validator
+except ImportError:
+    from Validator import Validator
+
 TITLE_FONT = ('Magneto', 24)  # Goofy font bc why not
-NO_USER_MSG = "No User Found"
 
 
 class SignupWindow:
@@ -322,17 +326,35 @@ class LoginWindow:
         """Find user that matches username and password, then set them as active user."""
         # FIXME: Does not warn user if login info is invalid
 
-        result = self.database.get_customer_by_username_password(
-            self.account_data["username"].get(),
-            self.account_data["password"].get()
-        )
+        # Validation setup
+        validator = Validator()
+        username = self.account_data["username"].get()
+        password = self.account_data["password"].get()
 
-        if result is None:
-            self.current_user.set(NO_USER_MSG)
+        # Run validation checks
+        validator.check_username_exists(username, self.database)
+        validator.check_username_password_match(username, password, self.database)
+
+        # Continue with login process if no validation failures occured
+        if validator.no_failures():
+            # Get user date corresponding with username and password
+            result = self.database.get_customer_by_username_password(
+                self.account_data["username"].get(),
+                self.account_data["password"].get()
+            )
+
+            # If somehow there is no valid user even after validation passed
+            if result is None:
+                self.current_user.set("Error: No User Found")
+            else:
+                self.current_user.set(str(self.database.get_customer_by_ID(result.ID)))
+                # self.current_user.set(result.ID)
+                """Ideally the above should store just ID, but this is temporary.
+                Right now it stores the whole customer object cast to a string so that it can display all information
+                on the main page"""
+
+            self.root.destroy()
+
+        # Validation failed, display the messages
         else:
-            self.current_user.set(str(self.database.get_customer_by_ID(result.ID)))
-            # self.current_user.set(result.ID) Ideally should store just ID, but this is temporary
-            # Right now it stores the whole customer object cast to a string so it can display all information
-            # on the main page.
-
-        self.root.destroy()
+            validator.display_failures()

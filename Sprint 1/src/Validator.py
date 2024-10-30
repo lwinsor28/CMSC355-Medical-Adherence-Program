@@ -28,7 +28,6 @@ class Validator:
 
     def no_failures(self) -> bool:
         """Looks at self._failed_cases and sees if any fail cases exist.
-        If a failed case exists, it calls an alert window to inform the user.
 
         Returns True if no failed cases exist and execution should resume as normal.
         Returns False is failed cases exist and an alternate execution path should be taken to allow the
@@ -40,13 +39,16 @@ class Validator:
 
         # All is not good
         else:
-            alert_message = ""
-            for message in self._failed_cases:
-                alert_message += message + "\n"
-                print(message)  # FIXME: Make it open an alert window
-            AlertWindow(alert_message)
-
             return False
+
+    def display_failures(self) -> AlertWindow:
+        """
+        Display an alert window containing all validation failure messages.
+        """
+        alert_message = ""
+        for message in self._failed_cases:
+            alert_message += message + "\n"
+        return AlertWindow(alert_message)
 
     def _add_failure(self, fail_message: str) -> None:
         """Adds failure message to self._failed_cases"""
@@ -126,7 +128,7 @@ class Validator:
         Checks the given database if the given username has an account associated with it.
         Test case implementation: Use Case 2, TC06
         """
-        FAIL_MESSAGE = "No account found with that username."
+        FAIL_MESSAGE = f"No account found with username {username}."
 
         for user in database.customers:
             if user.username == username:
@@ -138,7 +140,7 @@ class Validator:
         Checks the given database if the given username and password correctly match an existing user.
         Test case implementation: Use Case 2, TC07
         """
-        FAIL_MESSAGE = f"Password for \"{username}\" incorrect. Please try again."
+        FAIL_MESSAGE = f"Password for user \"{username}\" incorrect. Please try again."
 
         for user in database.customers:
             if user.username == username:
