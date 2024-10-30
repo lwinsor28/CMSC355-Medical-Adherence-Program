@@ -45,7 +45,7 @@ class App:
 
     def init_root(self):
         """Configure any window elements such as title, size, etc.
-        # Basically anything that isn't the *actual* application."""
+        Basically anything that isn't the *actual* application."""
 
         self.root.title('Home: Medical Adherence Software - Group 7')  # Window title
 
