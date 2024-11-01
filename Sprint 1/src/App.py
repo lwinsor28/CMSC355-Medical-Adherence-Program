@@ -106,9 +106,8 @@ class App:
             from datetime import date
             # Default users
             self.database.add_customer("Satoru", "Gojo", "thestr0ngest", "hollow&purple1989",
-                                       "satorugojo@jjhs.edu", "5551234567", date.fromisoformat("1989-12-07"))
+                                       "satorugojo@jjhs.edu", "5551234567")
             self.database.add_customer("Sukuna", "Ryoumen", "kingofcurses", "20fingers",
-                                       "imhim@malevolentshrine.lol", "5556666666",
-                                       date.fromisoformat("2018-06-01"))
+                                       "imhim@malevolentshrine.lol", "5556666666")
             # Save
             self.database.save_all()
