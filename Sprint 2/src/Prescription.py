@@ -11,13 +11,15 @@ from datetime import datetime
 
 
 class Prescription:
-    def __init__(self, drug_name: str, doctor_name: str,
+    def __init__(self, owner_ID: str,
+                 drug_name: str, doctor_name: str,
                  time_btwn_dose: int, side_effects: str,
                  date_issued_year: int, date_issued_month: int, date_issued_day: int,
                  expiration_date_year: int, expiration_date_month: int, expiration_date_day: int):
+        self.owner_ID = owner_ID  # ID of the Customer object that was logged in upon creation.
         self.drug_name = drug_name
         self.doctor_name = doctor_name
-        self.time_btwn_dose = time_btwn_dose
+        self.time_btwn_dose = time_btwn_dose  # Seconds
         self.side_effects = side_effects
 
         # Random ID to discern between prescriptions with identical names, date, etc.

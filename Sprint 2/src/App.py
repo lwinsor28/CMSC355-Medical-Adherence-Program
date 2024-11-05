@@ -22,6 +22,7 @@ except ImportError:
 
 NO_USER_MSG = "No User Signed In"
 
+# FIXME: Add a database save for when the window is closed to ensure all work is saved.
 
 class App:
     def __init__(self, main_root):
@@ -98,16 +99,4 @@ class App:
 
     def load_database(self):
         """Loads previous database. Otherwise, loads in defaults."""
-        try:
-            self.database.load()
-        except:
-            print("Problem loading database. Creating new database and inserting defaults...")
-            # No file was loaded. Let's load some defaults!
-            from datetime import date
-            # Default users
-            self.database.add_customer("Satoru", "Gojo", "thestr0ngest", "hollow&purple1989",
-                                       "satorugojo@jjhs.edu", "5551234567")
-            self.database.add_customer("Sukuna", "Ryoumen", "kingofcurses", "20fingers",
-                                       "imhim@malevolentshrine.lol", "5556666666")
-            # Save
-            self.database.save_all()
+        self.database.load()
