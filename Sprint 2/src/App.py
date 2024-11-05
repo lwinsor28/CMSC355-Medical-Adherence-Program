@@ -22,6 +22,7 @@ except ImportError:
 
 NO_USER_MSG = "No User Signed In"
 
+
 # FIXME: Add a database save for when the window is closed to ensure all work is saved.
 
 class App:
@@ -36,6 +37,8 @@ class App:
         self.database = Database()  # The original location of the loaded database
         self.current_user = tk.StringVar()  # Stores ID of signed-in user
         self.current_user.set(NO_USER_MSG)
+        self.current_user_info = tk.StringVar()  # Stores a string that displays all user info to show who is logged in.
+        self.current_user_info.set(NO_USER_MSG)
 
         # Load any necessary components
         self.init_root()
@@ -79,23 +82,30 @@ class App:
         login_button.grid(column=3, row=1, columnspan=2, sticky="NSEW")
 
     def create_current_user_label(self):
-        """Temporary measure to make sure everything works"""
+        """Temporary measure to make sure everything works. Jk, it will be here forever."""
         label_frame = tk.Frame(self.main_frame)
         label_frame.grid(column=1, row=2, padx=5, pady=5, columnspan=4, sticky="NSEW")
         label_frame.columnconfigure(1, weight=1)
         label_frame.columnconfigure(2, weight=1)
         user_label1 = tk.Label(label_frame, text="Current User: ")
         user_label1.grid(column=1, row=1, sticky="NSE")
-        user_label2 = tk.Label(label_frame, textvariable=self.current_user)
+        user_label2 = tk.Label(label_frame, textvariable=self.current_user_info)
         user_label2.grid(column=2, row=1, columnspan=3, sticky="NSW")
 
     def click_sign_up_button(self):
         """Tkinter is silly and old, so you can't pass arguments in button commands.
         This helper function gets around that"""
-        SignupWindow(self.database, self.current_user)
+        win = SignupWindow(self.database, self.current_user)
+        win.root.bind("<Destroy>", self.update_user_label)
 
     def click_log_in_button(self):
-        LoginWindow(self.database, self.current_user)
+        win = LoginWindow(self.database, self.current_user)
+        win.root.bind("<Destroy>", self.update_user_label)
+
+    def update_user_label(self, e=None):
+        """Updates the label that displays the current user info"""
+        user_info = str(self.database.get_customer_by_ID(self.current_user.get()))
+        self.current_user_info.set(user_info)
 
     def load_database(self):
         """Loads previous database. Otherwise, loads in defaults."""

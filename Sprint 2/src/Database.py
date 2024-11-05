@@ -24,16 +24,16 @@ class Database:
         self.PRESCRIPTION_FILE_NAME = "prescriptions.pkl"
 
     # CUSTOMER MANAGEMENT METHODS -----
-    def add_customer(self, first_name, last_name, username, password, email, phone_number) -> str:
-        """Adds new customer to database. Returns ID of new user"""
+    def add_customer(self, first_name, last_name, username, password, email, phone_number) -> Customer:
+        """Adds new customer to database. Returns object of the new user"""
         new_customer = Customer(first_name, last_name, username, password, email, phone_number)
         self.customers.append(new_customer)
         return new_customer.ID
 
-    def get_customer_by_ID(self, ID) -> Customer or None:
+    def get_customer_by_ID(self, ID: str) -> Customer or None:
         """Get customer object by ID. Returns None if no customer with ID exists."""
         for customer in self.customers:
-            if customer.ID == ID:
+            if str(customer.ID) == str(ID):
                 return customer
 
         return None
@@ -99,17 +99,19 @@ class Database:
         try:
             with open(self.CUSTOMER_FILE_NAME, "rb") as file:
                 self.customers = pickle.load(file)
-        except OSError:
+        except (OSError, ModuleNotFoundError):
             print("No customer file could be loaded. Loading in defaults...")
             self.load_default_customers()
+            self.save_customers()
 
         # Prescriptions
         try:
             with open(self.PRESCRIPTION_FILE_NAME, "rb") as file:
                 self.prescriptions = pickle.load(file)
-        except OSError:
+        except (OSError, ModuleNotFoundError):
             print("No database file could be loaded. Loading in defaults...")
             self.load_default_prescriptions()
+            self.save_prescriptions()
 
     def load_default_customers(self) -> None:
         """Loads 2 default customers into database. Assumes empty database, so does not check for username conflicts."""

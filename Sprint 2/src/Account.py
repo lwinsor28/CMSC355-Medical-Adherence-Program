@@ -79,6 +79,9 @@ class SignupWindow:
         logo = tk.PhotoImage(file='./assets/medical_icon.png')
         self.root.iconphoto(False, logo)
 
+        # Event bindings
+        self.root.bind("<KeyPress-Return>", self.click_create_account_button)
+
     def init_frames(self):
         """Configure the main content frames of the window."""
         # Configure the main frame
@@ -197,7 +200,7 @@ class SignupWindow:
             padx=5, pady=0, sticky="NEW"
         )
 
-    def click_create_account_button(self):
+    def click_create_account_button(self, e=None):
         """Adds new account to database and closes the window.
         Checks to make sure no issues exist with user input"""
 
@@ -209,7 +212,7 @@ class SignupWindow:
 
         # Check that no validation checks failed
         if validator.no_failures():
-            new_ID = self.database.add_customer(
+            result = self.database.add_customer(
                 self.account_data["first_name"].get(),
                 self.account_data["last_name"].get(),
                 self.account_data["username"].get(),
@@ -219,8 +222,7 @@ class SignupWindow:
                 self.account_data["phone_number"][1].get() +
                 self.account_data["phone_number"][2].get(),
             )
-            self.current_user.set(str(self.database.get_customer_by_ID(new_ID)))
-            # self.current_user.set(new_ID) Ideally should store just ID, but this is temporary
+            self.current_user.set(result)
             self.database.save_customers()
             self.root.destroy()
 
@@ -280,6 +282,9 @@ class LoginWindow:
         logo = tk.PhotoImage(file='./assets/medical_icon.png')
         self.root.iconphoto(False, logo)
 
+        # Event bindings
+        self.root.bind("<KeyPress-Return>", self.click_login_button)
+
     def init_frames(self):
         """Configure the main frame"""
         self.main_frame = tk.Frame(self.root, padx=3, pady=5)
@@ -331,7 +336,7 @@ class LoginWindow:
             padx=5, pady=5, sticky="SEW"
         )
 
-    def click_login_button(self):
+    def click_login_button(self, e=None):
         """Find user that matches username and password, then set them as active user.
         If issues arise, show an alert popup that explain what went wrong"""
 
@@ -353,11 +358,7 @@ class LoginWindow:
             if result is None:
                 self.current_user.set("Error: No User Found")
             else:
-                self.current_user.set(str(self.database.get_customer_by_ID(result.ID)))
-                # self.current_user.set(result.ID)
-                """Ideally the above should store just ID, but this is temporary.
-                Right now it stores the whole customer object cast to a string so that it can display all information
-                on the main page"""
+                self.current_user.set(result.ID)
 
             self.root.destroy()
 
