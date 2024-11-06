@@ -18,8 +18,10 @@ except ImportError:
 
 TITLE_FONT = ('Magneto', 24)  # Goofy font bc why not
 
+
 class MedicationMenuWindow:
     """Shows the main screen [PRO01] with the options for managing prescriptions shown and nothing else."""
+
     def __init__(self, database, current_user):
         # Open new window
         self.root = tk.Toplevel()
@@ -30,13 +32,10 @@ class MedicationMenuWindow:
 
         # Frames defined in other functions
         self.main_frame = None
-        self.button_frame = None
 
         # Grid constants
-        #self.TOP_ROW = 1
+        self.TOP_ROW = 1
         self.COL_WIDTH = 3
-        #self.ROW_PADX = 5
-        #self.ROW_PADY = 10
 
         # Colors
         self.DARK_GREY = "#b3b3b3"
@@ -45,6 +44,7 @@ class MedicationMenuWindow:
         self.init_root()
         self.init_frames()
         self.create_title_bar()
+        self.create_buttons()
 
     def init_root(self):
         """Configure any window elements such as title, size, etc."""
@@ -70,11 +70,9 @@ class MedicationMenuWindow:
         self.main_frame.grid(column=0, row=0, sticky="NSEW")
 
         self.main_frame.columnconfigure(0, weight=1)
+        self.main_frame.columnconfigure(1, weight=1)
+        self.main_frame.columnconfigure(2, weight=1)
         self.main_frame.rowconfigure(0, weight=1)
-
-        # Button frame
-        self.button_frame = tk.Frame(self.root, padx=3, pady=5)
-        self.main_frame.grid(column=0, row=0, sticky="NSEW")
 
     def create_title_bar(self):
         """Show header text."""
@@ -86,4 +84,22 @@ class MedicationMenuWindow:
 
     def create_buttons(self):
         """Create the three option buttons to select which prescription operation to execute."""
+        buttonContents = (
+            ("Add Prescription", self.click_add_prescription),
+            ("Edit Prescriptions", self.click_edit_prescriptions),
+            ("Delete Prescriptions", self.click_delete_prescriptions)
+        )
+
+        for idx in range(len(buttonContents)):
+            ttk.Button(self.main_frame, text=buttonContents[idx][0], command=buttonContents[idx][1]).grid(
+                column=idx, row=self.TOP_ROW, sticky="NSEW", padx=5, pady=5
+            )
+
+    def click_add_prescription(self):
+        pass
+
+    def click_edit_prescriptions(self):
+        pass
+
+    def click_delete_prescriptions(self):
         pass

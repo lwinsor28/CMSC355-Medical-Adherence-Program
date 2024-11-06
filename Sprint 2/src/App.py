@@ -78,7 +78,6 @@ class App:
         self.main_frame = tk.Frame(self.root, padx=3, pady=5)
         self.main_frame.grid(column=0, row=0, sticky="NSEW")
         for col in range(1, 5):
-            print(col)
             self.main_frame.columnconfigure(col, weight=1)
 
     def create_account_buttons(self):
