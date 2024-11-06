@@ -194,7 +194,7 @@ class SignupWindow:
         )
 
     def create_create_account_button(self):
-        tk.Button(self.main_frame, text="Create Account", command=self.click_create_account_button).grid(
+        ttk.Button(self.main_frame, text="Create Account", command=self.click_create_account_button).grid(
             column=1, row=2,
             columnspan=self.COL_WIDTH * 2, rowspan=1,
             padx=5, pady=0, sticky="NEW"
@@ -330,7 +330,7 @@ class LoginWindow:
                 self.account_data[item[1]]["show"] = "*"
 
     def create_login_button(self):
-        tk.Button(self.main_frame, text="Login", command=self.click_login_button).grid(
+        ttk.Button(self.main_frame, text="Login", command=self.click_login_button).grid(
             column=4, row=self.TOP_ROW + 1,
             columnspan=2, rowspan=2,
             padx=5, pady=5, sticky="SEW"
