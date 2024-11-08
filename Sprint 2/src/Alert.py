@@ -27,6 +27,10 @@ class AlertWindow:
         self.init_main_frame()
         self.init_label()
 
+        # Event bindings
+        self.root.focus()
+        self.root.bind("<KeyPress-Return>", self.exit)
+
     def init_root(self):
         """Configure any window elements such as title, size, etc.
         Basically anything that isn't the *actual* window."""
@@ -56,8 +60,8 @@ class AlertWindow:
         label = tk.Label(self.main_frame, textvariable=self.MESSAGE)
         label.grid(column=0, row=0, sticky="NSEW")
 
-        button = tk.Button(self.main_frame, text="Okay", command=self.exit)
+        button = ttk.Button(self.main_frame, text="Okay", command=self.exit)
         button.grid(column=0, row=1, pady=15, sticky="N")
 
-    def exit(self):
+    def exit(self, e=None):
         self.root.destroy()

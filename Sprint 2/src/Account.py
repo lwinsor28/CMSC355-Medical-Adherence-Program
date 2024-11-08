@@ -62,6 +62,9 @@ class SignupWindow:
         self.create_right_column()
         self.create_create_account_button()
 
+        # Focus on window
+        self.root.focus()
+
     def init_root(self):
         """Configure any window elements such as title, size, etc."""
 
@@ -264,6 +267,9 @@ class LoginWindow:
         self.create_title_bar()
         self.create_login_entries()
         self.create_login_button()
+
+        # Focus on window
+        self.root.focus()
 
     def init_root(self):
         """Configure any window elements such as title, size, etc."""

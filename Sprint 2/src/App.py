@@ -137,12 +137,17 @@ class App:
     def prescription_action_finished(self, e=None):
         """Runs when main prescription window is closed."""
         self.database.save_prescriptions()
+        self.root.focus()
 
     def account_action_finished(self, e=None):
         """Updates the label that displays the current user info. Also saves the customer database."""
         # Update user label
-        user_info = str(self.database.get_customer_by_ID(self.current_user.get()))
-        self.current_user_info.set(user_info)
+        if self.current_user.get() != NO_USER_MSG:
+            user_info = str(self.database.get_customer_by_ID(self.current_user.get()))
+            self.current_user_info.set(user_info)
 
         # Save customer database
         self.database.save_customers()
+
+        # Put window focus on main menu
+        self.root.focus()
