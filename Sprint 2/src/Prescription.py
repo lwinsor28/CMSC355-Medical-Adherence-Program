@@ -38,11 +38,13 @@ class Prescription:
         Side Effects: {4}
         Date Issued: {5}
         Date Expiration: {6}
-        ID: {7}""".format(
+        ID: {7}
+        Owner ID: {8}""".format(
             self.drug_name, self.doctor_name,
             self.dosage,
             self.time_btwn_dose,
             self.side_effects,
             self.date_issued.isoformat(), self.expiration_date.isoformat(),
-            self.ID
+            self.ID,
+            self.owner_ID
         )
