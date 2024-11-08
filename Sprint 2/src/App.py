@@ -122,6 +122,7 @@ class App:
 
     def click_prescription_button(self):
         """Opens the prescription management menu"""
+        # FIXME: Don't allow prescription stuff without a user being logged in
         win = MedicationMenuWindow(self.database, self.current_user)
         win.root.bind("<Destroy>", self.prescription_action_finished)
 

@@ -48,13 +48,13 @@ class Database:
 
     # PRESCRIPTION MANAGEMENT METHODS -----
     def add_prescription(self, owner_ID: str, drug_name: str, doctor_name: str, time_btwn_dose: int, side_effects: str,
-                         date_issued_year: int, date_issued_month: int, date_issued_day: int,
+                         dosage: str, date_issued_year: int, date_issued_month: int, date_issued_day: int,
                          expiration_date_year: int, expiration_date_month: int, expiration_date_day: int) -> str:
         """Adds new prescription to database.
         Returns the ID of the new prescription."""
         new_prescription = Prescription(
             owner_ID, drug_name, doctor_name, time_btwn_dose, side_effects,
-            date_issued_year, date_issued_month, date_issued_day,
+            dosage, date_issued_year, date_issued_month, date_issued_day,
             expiration_date_year, expiration_date_month, expiration_date_day
         )
         self.prescriptions.append(new_prescription)
@@ -125,9 +125,9 @@ class Database:
         Note, this leaves the 2nd default user `Sukuna` without prescriptions on purpose for testing."""
         gojo = self.get_customer_by_username_password("thestr0ngest", "hollow&purple1989")
         self.add_prescription(gojo.ID, "Copium", "Gege Akutami", 60*60*24*7, "Sudden torso separation.",
-                              2023, 9, 25, 2024, 9, 29)
+                              "500mg", 2023, 9, 25, 2024, 9, 29)
         self.add_prescription(gojo.ID, "Reverse Cursed Technique", "Ieiri Shoko", 60*2,
-                              "Temporary loss of mental faculties.",
+                              "Temporary loss of mental faculties.", "5kg",
                               2019, 9, 9, 2024, 9, 29)
 
     def __str__(self):
