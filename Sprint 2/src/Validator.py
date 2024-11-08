@@ -150,10 +150,17 @@ class Validator:
                     break
         self._add_failure(FAIL_MESSAGE)
 
+    # Validation cases not used in any specific test cases, but included to preserve functionality of the app.
+    def check_user_logged_in(self, current_user_ID, no_user_msg):
+        """Makes sure user is logged in before the prescriptions menu can be accessed."""
+        FAIL_MESSAGE = "No user logged in. Please login to an account before accessing this menu!"
+
+        if current_user_ID == no_user_msg:
+            self._add_failure(FAIL_MESSAGE)
+
 
 """Some manual testing of test cases is performed here if this file is run by itself."""
 if __name__ == "__main__":
-
     # Fake database
     db = Database()
     db.add_customer("Satoru", "Gojo", "thestr0ngest", "hollow&purple1989",

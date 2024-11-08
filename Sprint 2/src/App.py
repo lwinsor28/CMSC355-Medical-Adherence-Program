@@ -17,12 +17,13 @@ try:
     from src.Alert import AlertWindow
     from src.Database import Database
     from src.Medication import MedicationMenuWindow
+    from src.Validator import Validator
 except ImportError:
     from Account import SignupWindow, LoginWindow
     from Alert import AlertWindow
     from Database import Database
     from Medication import MedicationMenuWindow
-    quit()
+    from Validator import Validator
 
 NO_USER_MSG = "No User Signed In"
 
@@ -123,8 +124,15 @@ class App:
     def click_prescription_button(self):
         """Opens the prescription management menu"""
         # FIXME: Don't allow prescription stuff without a user being logged in
-        win = MedicationMenuWindow(self.database, self.current_user)
-        win.root.bind("<Destroy>", self.prescription_action_finished)
+
+        validator = Validator()
+        validator.check_user_logged_in(self.current_user.get(), NO_USER_MSG)
+
+        if validator.no_failures():
+            win = MedicationMenuWindow(self.database, self.current_user)
+            win.root.bind("<Destroy>", self.prescription_action_finished)
+        else:
+            validator.display_failures()
 
     def prescription_action_finished(self, e=None):
         """Runs when main prescription window is closed."""
