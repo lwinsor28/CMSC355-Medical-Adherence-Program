@@ -116,14 +116,25 @@ class App:
         win = SignupWindow(self.database, self.current_user)
         win.root.bind("<Destroy>", self.account_action_finished)
 
+        # FIXME: Sneaking this in while debugging
+        print(str(self.database))
+
     def click_log_in_button(self):
         """Opens login menu and then updates the logged-in user label upon completion."""
         win = LoginWindow(self.database, self.current_user)
-        win.root.bind("<Destroy>", self.account_action_finished)
+
+        # FIXME: Sneaking this in while debugging
+        win.account_data["username"] = tk.StringVar()
+        win.account_data["username"].set("thestr0ngest")
+        win.account_data["password"] = tk.StringVar()
+        win.account_data["password"].set("hollow&purple1989")
+        win.click_login_button()
+        self.account_action_finished()
+
+        #win.root.bind("<Destroy>", self.account_action_finished) put this back when done debugging
 
     def click_prescription_button(self):
         """Opens the prescription management menu"""
-        # FIXME: Don't allow prescription stuff without a user being logged in
 
         validator = Validator()
         validator.check_user_logged_in(self.current_user.get(), NO_USER_MSG)

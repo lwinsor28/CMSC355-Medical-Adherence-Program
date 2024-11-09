@@ -24,7 +24,7 @@ class Prescription:
         self.dosage = dosage
 
         # Random ID to discern between prescriptions with identical names, date, etc.
-        self.ID = uuid.uuid4()
+        self.ID = str(uuid.uuid4())
 
         # Dates are special.
         self.date_issued = datetime(date_issued_year, date_issued_month, date_issued_day)

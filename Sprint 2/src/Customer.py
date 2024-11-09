@@ -18,7 +18,7 @@ class Customer:
         self.password = password  # Password stored in plaintext. This is terrible, but it doesn't matter here.
         self.email = email
         self.phone_number = phone_number
-        self.ID = uuid.uuid4()  # Random ID to discern between customers with identical names, email, etc.
+        self.ID = str(uuid.uuid4())  # Random ID to discern between customers with identical names, email, etc.
 
     def __str__(self):
         return "Name: {0} {1},\nUsername/Password: {2}, {3},\nEmail/Phone: {4}, {5},\nID: {6}".format(

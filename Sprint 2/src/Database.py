@@ -68,7 +68,7 @@ class Database:
 
         return None
 
-    def get_prescription_by_owner_ID(self, user_id: str) -> tuple[Prescription] or None:
+    def get_prescriptions_by_owner_ID(self, user_id: str) -> tuple[Prescription] or None:
         """Find all prescriptions owned by the given user. Returns None if no match is found"""
         result = []
         for prescription in self.prescriptions:
@@ -76,6 +76,18 @@ class Database:
                 result.append(prescription)
 
         return tuple(result) if len(result) != 0 else None
+
+    def delete_prescription_by_drug_name(self, drug_name: str, user_id: str) -> None:
+        """Given a drug name, will delete the given user's instance of that drug.
+
+        Yes, it doesn't use the (much better) ID to index results. This is because tkinter's OptionMenu
+        only lets you see what the actual name of the selection is, rather than giving an index or anything sensible."""
+
+        for idx in range(len(self.prescriptions)):
+            prescription = self.prescriptions[idx]
+            if (prescription.owner_ID == user_id) and (prescription.drug_name == drug_name):
+                self.prescriptions.pop(idx)
+                break
 
     # SAVING METHODS -----
     def save_customers(self) -> None:
@@ -124,9 +136,9 @@ class Database:
         """Loads 2 default prescriptions for default user `Satoru`.
         Note, this leaves the 2nd default user `Sukuna` without prescriptions on purpose for testing."""
         gojo = self.get_customer_by_username_password("thestr0ngest", "hollow&purple1989")
-        self.add_prescription(gojo.ID, "Copium", "Gege Akutami", 60*60*24*7, "Sudden torso separation.",
+        self.add_prescription(gojo.ID, "Copium", "Gege Akutami", 60 * 60 * 24 * 7, "Sudden torso separation.",
                               "500mg", 2023, 9, 25, 2024, 9, 29)
-        self.add_prescription(gojo.ID, "Reverse Cursed Technique", "Ieiri Shoko", 60*2,
+        self.add_prescription(gojo.ID, "Reverse Cursed Technique", "Ieiri Shoko", 60 * 2,
                               "Temporary loss of mental faculties.", "5kg",
                               2019, 9, 9, 2024, 9, 29)
 
@@ -164,6 +176,7 @@ if __name__ == "__main__":
         print("Save/load test unsuccessful")
 
     import os
+
     if os.path.exists(db.CUSTOMER_FILE_NAME):
         os.remove(db.CUSTOMER_FILE_NAME)
     if os.path.exists(db.PRESCRIPTION_FILE_NAME):
