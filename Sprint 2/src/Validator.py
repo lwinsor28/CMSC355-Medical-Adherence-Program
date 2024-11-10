@@ -17,6 +17,7 @@ Feel free to add a new validation function into the class if necessary.
 """
 
 import re
+from datetime import datetime
 
 from src.Database import Database
 from src.Alert import AlertWindow
@@ -151,11 +152,35 @@ class Validator:
         self._add_failure(FAIL_MESSAGE)
 
     # Validation cases not used in any specific test cases, but included to preserve functionality of the app.
-    def check_user_logged_in(self, current_user_ID, no_user_msg):
+    def check_user_logged_in(self, current_user_ID, no_user_msg) -> None:
         """Makes sure user is logged in before the prescriptions menu can be accessed."""
         FAIL_MESSAGE = "No user logged in. Please login to an account before accessing this menu!"
 
         if current_user_ID == no_user_msg:
+            self._add_failure(FAIL_MESSAGE)
+
+    def check_dates_are_valid(self, prescription_data: dict) -> None:
+        """Make sure that prescription date fields are valid integers."""
+        FAIL_MESSAGE = "The date(s) are invalid in some regard. Please input valid dates."
+
+        try:
+            datetime(int(prescription_data["date_issued"][2].get()),
+                     int(prescription_data["date_issued"][0].get()),
+                     int(prescription_data["date_issued"][1].get())
+                     )
+            datetime(int(prescription_data["expiration_date"][2].get()),
+                     int(prescription_data["expiration_date"][0].get()),
+                     int(prescription_data["expiration_date"][1].get())
+                     )
+
+        except ValueError:
+            self._add_failure(FAIL_MESSAGE)
+
+    def check_str_not_blank(self, input_str: str, field_name: str) -> None:
+        """Check that the given string is not blank. Useful to make sure usernames/prescription names are not blank."""
+        FAIL_MESSAGE = f"{field_name.title()} cannot be blank."
+
+        if (input_str is None) or (input_str == ""):
             self._add_failure(FAIL_MESSAGE)
 
 

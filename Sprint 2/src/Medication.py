@@ -277,15 +277,16 @@ class AddMedicationWindow(_MedicationInputParent):
 
     def click_done_button(self, e=None):
         # Run validation tests
-        # FIXME: No validation tests
         validator = Validator()
+        validator.check_dates_are_valid(self.prescription_data)
+        validator.check_str_not_blank(self.prescription_data["drug_name"].get(), "Drug Name")
 
         if validator.no_failures():
             self.database.add_prescription(
                 self.current_user.get(),
                 self.prescription_data["drug_name"].get(),
                 self.prescription_data["doctor"].get(),
-                int(self.prescription_data["time_btwn_dose"].get()),
+                self.prescription_data["time_btwn_dose"].get(),
                 self.prescription_data["side_effects"].get(),
                 self.prescription_data["dosage"].get(),
                 int(self.prescription_data["date_issued"][2].get()),  # year
@@ -373,8 +374,9 @@ class EditMedicationWindow(_MedicationInputParent):
 
     def click_done_button(self, e=None):
         # Run validation tests
-        # FIXME: No validation tests
         validator = Validator()
+        validator.check_dates_are_valid(self.prescription_data)
+        validator.check_str_not_blank(self.prescription_data["drug_name"].get(), "Drug Name")
 
         if validator.no_failures():
             # Delete the old prescription
@@ -388,7 +390,7 @@ class EditMedicationWindow(_MedicationInputParent):
                 self.current_user.get(),
                 self.prescription_data["drug_name"].get(),
                 self.prescription_data["doctor"].get(),
-                int(self.prescription_data["time_btwn_dose"].get()),
+                self.prescription_data["time_btwn_dose"].get(),
                 self.prescription_data["side_effects"].get(),
                 self.prescription_data["dosage"].get(),
                 int(self.prescription_data["date_issued"][2].get()),  # year

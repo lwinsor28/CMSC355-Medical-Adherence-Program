@@ -85,7 +85,6 @@ class Database:
 
         for idx in range(len(self.prescriptions)):
             prescription = self.prescriptions[idx]
-            print(f'{prescription.owner_ID} == {user_id}\n\t{prescription.drug_name} == {drug_name}\n\t{(prescription.owner_ID == user_id) and (prescription.drug_name == drug_name)}')
             if (prescription.owner_ID == user_id) and (prescription.drug_name == drug_name):
                 self.prescriptions.pop(idx)
                 break
@@ -122,7 +121,7 @@ class Database:
             with open(self.PRESCRIPTION_FILE_NAME, "rb") as file:
                 self.prescriptions = pickle.load(file)
         except (OSError, ModuleNotFoundError):
-            print("No database file could be loaded. Loading in defaults...")
+            print("No prescription file could be loaded. Loading in defaults...")
             self.load_default_prescriptions()
             self.save_prescriptions()
 
@@ -137,9 +136,9 @@ class Database:
         """Loads 2 default prescriptions for default user `Satoru`.
         Note, this leaves the 2nd default user `Sukuna` without prescriptions on purpose for testing."""
         gojo = self.get_customer_by_username_password("thestr0ngest", "hollow&purple1989")
-        self.add_prescription(gojo.ID, "Copium", "Gege Akutami", 60 * 60 * 24 * 7, "Sudden torso separation.",
+        self.add_prescription(gojo.ID, "Copium", "Gege Akutami", "1 week", "Sudden torso separation.",
                               "500mg", 2023, 9, 25, 2024, 9, 29)
-        self.add_prescription(gojo.ID, "Reverse Cursed Technique", "Ieiri Shoko", 60 * 2,
+        self.add_prescription(gojo.ID, "Reverse Cursed Technique", "Ieiri Shoko", "2 minutes",
                               "Temporary loss of mental faculties.", "5kg",
                               2019, 9, 9, 2024, 9, 29)
 
