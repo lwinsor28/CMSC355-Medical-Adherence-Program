@@ -97,16 +97,19 @@ class MedicationMenuWindow:
 
     def click_add_prescription(self):
         win = AddMedicationWindow("Add Prescription", self.database, self.current_user)
-        win.root.bind("<Destroy>", self.focus_window)
+        win.root.bind("<Destroy>", self.option_window_close)
 
     def click_edit_prescriptions(self):
-        pass
+        win = EditMedicationWindow("Edit Prescription", self.database, self.current_user)
+        win.root.bind("<Destroy>", self.option_window_close)
 
     def click_delete_prescriptions(self):
         win = DeleteMedicationWindow(self.database, self.current_user)
-        win.root.bind("<Destroy>", self.focus_window)
+        win.root.bind("<Destroy>", self.option_window_close)
 
-    def focus_window(self, e=None):
+    def option_window_close(self, e=None):
+        """Runs when any of the prescription option windows close."""
+        self.database.save_prescriptions()
         self.root.focus()
 
 
@@ -127,6 +130,7 @@ class _MedicationInputParent:
 
         # Which function to execute when the Done button is clicked
         self.done_func = done_func
+        self.done_button = None
 
         # Database
         self.database = database
@@ -137,6 +141,7 @@ class _MedicationInputParent:
 
         # Holds all fields except for name of prescription (implemented by child).
         self.prescription_data = {
+            "drug_name": tk.StringVar(),
             "doctor": tk.StringVar(),
             "date_issued": (tk.StringVar(), tk.StringVar(), tk.StringVar()),
             "dosage": tk.StringVar(),
@@ -146,7 +151,7 @@ class _MedicationInputParent:
         }
 
         # Grid constants
-        self.TOP_ROW = 1
+        self.TOP_ROW = 2
         self.COL_WIDTH = 4
 
         # Colors
@@ -190,7 +195,7 @@ class _MedicationInputParent:
     def create_title_bar(self):
         """Creates a header with the text from self.title"""
         tk.Label(self.main_frame, textvariable=self.title, font=TITLE_FONT, background=self.DARK_GREY).grid(
-            column=0, row=self.TOP_ROW - 1,
+            column=0, row=self.TOP_ROW - 2,
             columnspan=self.COL_WIDTH, rowspan=1,
             padx=5, pady=0, sticky="NEW"
         )
@@ -200,6 +205,7 @@ class _MedicationInputParent:
         # Holds the names and their related self.prescription_data references for text entry widgets
         # [0] = prescription_data name, [1] = display name
         items = (
+            ("drug_name", "Prescription Name"),
             ("doctor", "Name of Prescriber"),
             ("dosage", "Dosage"),
             ("time_btwn_dose", "Time Between Dose"),
@@ -257,7 +263,8 @@ class _MedicationInputParent:
             column=self.COL_WIDTH - 2, row=self.TOP_ROW + len(items) + 3,
             columnspan=1, sticky="SEW", padx=5, pady=8
         )
-        ttk.Button(self.main_frame, text="Done", command=self.done_func).grid(
+        self.done_button = ttk.Button(self.main_frame, text="Done", command=self.done_func)
+        self.done_button.grid(
             column=self.COL_WIDTH - 1, row=self.TOP_ROW + len(items) + 3,
             columnspan=1, sticky="SEW", padx=5, pady=8
         )
@@ -268,31 +275,15 @@ class AddMedicationWindow(_MedicationInputParent):
         """Takes the shared elements and adds a prescription name input box."""
         super().__init__(window_title, self.click_done_button, database, current_user)
 
-        # Prescription name input
-        self.prescription_name = tk.StringVar()
-
-        # Make box for prescription name input
-        self.create_prescription_name_input()
-
-    def create_prescription_name_input(self):
-        tk.Label(self.main_frame, text="Prescription Name").grid(
-            column=0, row=self.TOP_ROW,
-            columnspan=1, sticky="NSEW", padx=5, pady=5
-        )
-        tk.Entry(self.main_frame, textvariable=self.prescription_name).grid(
-            column=1, row=self.TOP_ROW,
-            columnspan=self.COL_WIDTH - 1, sticky="NSEW", padx=10, pady=5
-        )
-
     def click_done_button(self, e=None):
         # Run validation tests
         # FIXME: No validation tests
         validator = Validator()
 
         if validator.no_failures():
-            new_ID = self.database.add_prescription(
+            self.database.add_prescription(
                 self.current_user.get(),
-                self.prescription_name.get(),
+                self.prescription_data["drug_name"].get(),
                 self.prescription_data["doctor"].get(),
                 int(self.prescription_data["time_btwn_dose"].get()),
                 self.prescription_data["side_effects"].get(),
@@ -305,7 +296,108 @@ class AddMedicationWindow(_MedicationInputParent):
                 int(self.prescription_data["expiration_date"][1].get()),  # day
             )
 
-            print(str(self.database.get_prescription_by_ID(new_ID)))
+            self.root.destroy()
+
+        else:
+            validator.display_failures()
+
+
+class EditMedicationWindow(_MedicationInputParent):
+    def __init__(self, window_title, database, current_user):
+        """Takes the shared elements and adds a prescription name input box."""
+        super().__init__(window_title, self.click_done_button, database, current_user)
+
+        # Window size
+        self.root.geometry('450x350')
+
+        # OptionMenu selection variable
+        self.selection = tk.StringVar()
+
+        self.create_prescription_selection()
+        self.update_prescription_selection()
+
+        # Update prescription data fields when OptionMenu selection changes.
+        self.selection.trace_add("write", self.update_prescription_selection)
+
+    def create_prescription_selection(self):
+        """Creates the selection box that allows the user to pick from their medications."""
+        # Get an iterable list of the user's prescriptions and a copy with just the names.
+        user_prescription_data = self.database.get_prescriptions_by_owner_ID(self.current_user.get())
+
+        # Check if user has any prescriptions
+        # If user has no prescriptions, show a blank box.
+        if user_prescription_data is None:
+            self.selection.set("")
+            ttk.Label(self.main_frame, text="Current user has no prescriptions to edit!").grid(
+                column=0, row=self.TOP_ROW - 1,
+                columnspan=1, rowspan=1,
+                padx=5, pady=10, sticky="NSEW"
+            )
+            self.done_button.state(['disabled'])  # Disable the done button if no prescriptions exist
+
+        # If user has prescriptions, do as normal
+        else:
+            user_prescription_names = [x.drug_name for x in user_prescription_data]
+            # Create label
+            ttk.Label(self.main_frame, text="Select Prescription:").grid(
+                column=0, row=self.TOP_ROW - 1,
+                columnspan=1, rowspan=1,
+                padx=5, pady=10, sticky="NSEW"
+            )
+
+            # Create selection widget
+            combobox = ttk.OptionMenu(self.main_frame, self.selection,
+                                      user_prescription_names[0], *user_prescription_names)
+            combobox.grid(
+                column=1, row=self.TOP_ROW - 1,
+                columnspan=self.COL_WIDTH - 1, rowspan=1,
+                padx=5, pady=10, sticky="NSEW"
+            )
+
+    def update_prescription_selection(self, *e):
+        """Runs when a new prescription is selected from the option menu."""
+        for prescription in self.database.prescriptions:
+            if (prescription.owner_ID == self.current_user.get()) and (prescription.drug_name == self.selection.get()):
+                self.prescription_data["drug_name"].set(prescription.drug_name)
+                self.prescription_data["doctor"].set(prescription.doctor_name)
+                self.prescription_data["time_btwn_dose"].set(prescription.time_btwn_dose)
+                self.prescription_data["side_effects"].set(prescription.side_effects)
+                self.prescription_data["dosage"].set(prescription.dosage)
+                self.prescription_data["date_issued"][2].set(prescription.date_issued.year) # year
+                self.prescription_data["date_issued"][0].set(prescription.date_issued.month)  # month
+                self.prescription_data["date_issued"][1].set(prescription.date_issued.day)  # day
+                self.prescription_data["expiration_date"][2].set(prescription.expiration_date.year)  # year
+                self.prescription_data["expiration_date"][0].set(prescription.expiration_date.month)  # month
+                self.prescription_data["expiration_date"][1].set(prescription.expiration_date.day)  # day
+                break
+
+    def click_done_button(self, e=None):
+        # Run validation tests
+        # FIXME: No validation tests
+        validator = Validator()
+
+        if validator.no_failures():
+            # Delete the old prescription
+            self.database.delete_prescription_by_drug_name(
+                self.selection.get(),
+                self.current_user.get()
+            )
+
+            # Add the edited prescription
+            self.database.add_prescription(
+                self.current_user.get(),
+                self.prescription_data["drug_name"].get(),
+                self.prescription_data["doctor"].get(),
+                int(self.prescription_data["time_btwn_dose"].get()),
+                self.prescription_data["side_effects"].get(),
+                self.prescription_data["dosage"].get(),
+                int(self.prescription_data["date_issued"][2].get()),  # year
+                int(self.prescription_data["date_issued"][0].get()),  # month
+                int(self.prescription_data["date_issued"][1].get()),  # day
+                int(self.prescription_data["expiration_date"][2].get()),  # year
+                int(self.prescription_data["expiration_date"][0].get()),  # month
+                int(self.prescription_data["expiration_date"][1].get()),  # day
+            )
 
             self.root.destroy()
 

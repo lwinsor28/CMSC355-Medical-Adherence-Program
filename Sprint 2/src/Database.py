@@ -85,6 +85,7 @@ class Database:
 
         for idx in range(len(self.prescriptions)):
             prescription = self.prescriptions[idx]
+            print(f'{prescription.owner_ID} == {user_id}\n\t{prescription.drug_name} == {drug_name}\n\t{(prescription.owner_ID == user_id) and (prescription.drug_name == drug_name)}')
             if (prescription.owner_ID == user_id) and (prescription.drug_name == drug_name):
                 self.prescriptions.pop(idx)
                 break
