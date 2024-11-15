@@ -122,7 +122,7 @@ class _MedicationInputParent:
 
     Note: Row 1 (self.TOP_ROW) is reserved for the name of prescription box implemented by the child."""
 
-    def __init__(self, window_title, done_func, database, current_user):
+    def __init__(self, window_title, done_func, database, current_user, drug_name_immutable=False):
         # Open new window
         self.root = tk.Toplevel()
         self.title = tk.StringVar()
@@ -131,6 +131,8 @@ class _MedicationInputParent:
         # Which function to execute when the Done button is clicked
         self.done_func = done_func
         self.done_button = None
+        # Flags drug name field to be blocked from editing (off by default)
+        self.drug_name_immutable = drug_name_immutable
 
         # Database
         self.database = database
@@ -225,10 +227,16 @@ class _MedicationInputParent:
                 column=0, row=self.TOP_ROW + idx + 1,
                 columnspan=1, sticky="NSEW", padx=5, pady=5
             )
-            tk.Entry(self.main_frame, textvariable=self.prescription_data[item[0]]).grid(
+            entryBox = tk.Entry(self.main_frame, textvariable=self.prescription_data[item[0]])
+            entryBox.grid(
                 column=1, row=self.TOP_ROW + idx + 1,
                 columnspan=self.COL_WIDTH - 1, sticky="NSEW", padx=10, pady=5
             )
+
+            # Make drug name field immutable if specified
+            if self.drug_name_immutable is True:
+                if item[0] == "drug_name":
+                    entryBox["state"] = "disabled"
 
         # Date inputs
         for idx in range(len(date_items)):
@@ -312,7 +320,7 @@ class AddMedicationWindow(_MedicationInputParent):
 class EditMedicationWindow(_MedicationInputParent):
     def __init__(self, window_title, database, current_user):
         """Takes the shared elements and adds a prescription name input box."""
-        super().__init__(window_title, self.click_done_button, database, current_user)
+        super().__init__(window_title, self.click_done_button, database, current_user, drug_name_immutable=True)
 
         # Window size
         self.root.geometry('450x350')
