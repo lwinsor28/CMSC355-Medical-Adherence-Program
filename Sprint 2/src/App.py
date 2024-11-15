@@ -68,7 +68,7 @@ class App:
 
         # Window size
         self.root.geometry('400x300')
-        self.root.resizable(width=False, height=False)
+        self.root.resizable(width=True, height=True)
 
         # Window Logo
         logo = tk.PhotoImage(file='./assets/medical_icon.png')

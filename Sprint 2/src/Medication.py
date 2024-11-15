@@ -57,7 +57,7 @@ class MedicationMenuWindow:
 
         # Window size
         self.root.geometry('450x150')
-        self.root.resizable(width=False, height=False)
+        self.root.resizable(width=True, height=True)
 
         # Window Logo
         logo = tk.PhotoImage(file='./assets/medical_icon.png')
@@ -177,7 +177,7 @@ class _MedicationInputParent:
 
         # Window size
         self.root.geometry('450x330')
-        self.root.resizable(width=False, height=False)
+        self.root.resizable(width=True, height=True)
 
         # Window Logo
         logo = tk.PhotoImage(file='./assets/medical_icon.png')
@@ -448,7 +448,7 @@ class DeleteMedicationWindow:
 
         # Window size
         self.root.geometry('450x200')
-        self.root.resizable(width=False, height=False)
+        self.root.resizable(width=True, height=True)
 
         # Window Logo
         logo = tk.PhotoImage(file='./assets/medical_icon.png')

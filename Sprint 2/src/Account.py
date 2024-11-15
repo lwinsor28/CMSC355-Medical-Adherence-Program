@@ -76,7 +76,7 @@ class SignupWindow:
 
         # Window size
         self.root.geometry('450x300')
-        self.root.resizable(width=False, height=False)
+        self.root.resizable(width=True, height=True)
 
         # Window Logo
         logo = tk.PhotoImage(file='./assets/medical_icon.png')
@@ -282,7 +282,7 @@ class LoginWindow:
 
         # Window size
         self.root.geometry('450x150')
-        self.root.resizable(width=False, height=False)
+        self.root.resizable(width=True, height=True)
 
         # Window Logo
         logo = tk.PhotoImage(file='./assets/medical_icon.png')
