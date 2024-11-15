@@ -320,6 +320,13 @@ class EditMedicationWindow(_MedicationInputParent):
         # Update prescription data fields when OptionMenu selection changes.
         self.selection.trace_add("write", self.update_prescription_selection)
 
+        # Check that prescriptions exist to edit. If not, show an alert then close the window.
+        validator = Validator()
+        validator.check_user_has_prescriptions(self.current_user.get(), self.database)
+        if not validator.no_failures():
+            win = validator.display_failures()
+            win.root.bind("<Destroy>", self.close_window)
+
     def create_prescription_selection(self):
         """Creates the selection box that allows the user to pick from their medications."""
         # Get an iterable list of the user's prescriptions and a copy with just the names.
@@ -364,7 +371,7 @@ class EditMedicationWindow(_MedicationInputParent):
                 self.prescription_data["time_btwn_dose"].set(prescription.time_btwn_dose)
                 self.prescription_data["side_effects"].set(prescription.side_effects)
                 self.prescription_data["dosage"].set(prescription.dosage)
-                self.prescription_data["date_issued"][2].set(prescription.date_issued.year) # year
+                self.prescription_data["date_issued"][2].set(prescription.date_issued.year)  # year
                 self.prescription_data["date_issued"][0].set(prescription.date_issued.month)  # month
                 self.prescription_data["date_issued"][1].set(prescription.date_issued.day)  # day
                 self.prescription_data["expiration_date"][2].set(prescription.expiration_date.year)  # year
@@ -406,9 +413,14 @@ class EditMedicationWindow(_MedicationInputParent):
         else:
             validator.display_failures()
 
+    def close_window(self, e=None):
+        """Callback helper"""
+        self.root.destroy()
+
 
 class DeleteMedicationWindow:
     """Allows the user to select a medication to delete"""
+
     def __init__(self, database, current_user):
         # Open new window
         self.root = tk.Toplevel()

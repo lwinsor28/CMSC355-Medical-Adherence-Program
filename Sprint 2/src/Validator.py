@@ -151,13 +151,17 @@ class Validator:
                     break
         self._add_failure(FAIL_MESSAGE)
 
-    # Validation cases not used in any specific test cases, but included to preserve functionality of the app.
     def check_user_logged_in(self, current_user_ID, no_user_msg) -> None:
-        """Makes sure user is logged in before the prescriptions menu can be accessed."""
+        """
+        Makes sure user is logged in before the prescriptions menu can be accessed.
+        Test case implementation: Use Case 1, TC06
+        """
         FAIL_MESSAGE = "No user logged in. Please login to an account before accessing this menu!"
 
         if current_user_ID == no_user_msg:
             self._add_failure(FAIL_MESSAGE)
+
+    # Validation cases not used in any specific test cases, but included to preserve functionality of the app.
 
     def check_dates_are_valid(self, prescription_data: dict) -> None:
         """Make sure that prescription date fields are valid integers."""
@@ -182,6 +186,16 @@ class Validator:
 
         if (input_str is None) or (input_str == ""):
             self._add_failure(FAIL_MESSAGE)
+
+    def check_user_has_prescriptions(self, user_id: str, database: Database) -> None:
+        """Check that given user has any prescriptions."""
+        FAIL_MESSAGE = "Current user has no prescriptions to edit!"
+
+        for prescription in database.prescriptions:
+            if prescription.owner_ID == user_id:
+                return
+
+        self._add_failure(FAIL_MESSAGE)
 
 
 """Some manual testing of test cases is performed here if this file is run by itself."""
