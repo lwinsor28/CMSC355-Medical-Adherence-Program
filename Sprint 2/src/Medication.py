@@ -282,13 +282,19 @@ class AddMedicationWindow(_MedicationInputParent):
         validator.check_str_not_blank(self.prescription_data["drug_name"].get(), "Drug Name")
 
         if validator.no_failures():
+            # Automatically add "mg" to dosage
+            dosage = self.prescription_data["dosage"].get()
+            if f"{dosage[-2]}{dosage[-1]}" != "mg":
+                dosage += "mg"
+
+            # Add prescription to database
             self.database.add_prescription(
                 self.current_user.get(),
                 self.prescription_data["drug_name"].get(),
                 self.prescription_data["doctor"].get(),
                 self.prescription_data["time_btwn_dose"].get(),
                 self.prescription_data["side_effects"].get(),
-                self.prescription_data["dosage"].get(),
+                dosage,
                 int(self.prescription_data["date_issued"][2].get()),  # year
                 int(self.prescription_data["date_issued"][0].get()),  # month
                 int(self.prescription_data["date_issued"][1].get()),  # day
