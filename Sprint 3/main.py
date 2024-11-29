@@ -2,8 +2,8 @@
 Project: Medical Adherence Program
 Class: CMSC 355-001 Fall 2024
 Authors: Group 7
-Assignment: Sprint 2
-Date: 2024/11/15
+Assignment: Sprint 3
+Date: 2024/12/04
 """
 
 from src.App import App
