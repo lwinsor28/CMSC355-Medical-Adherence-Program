@@ -13,7 +13,7 @@ from datetime import datetime
 class Prescription:
     def __init__(self, owner_ID: str,
                  drug_name: str, doctor_name: str,
-                 time_btwn_dose: str, side_effects: str, dosage: str,
+                 time_btwn_dose: int, side_effects: str, dosage: str,
                  date_issued_year: int, date_issued_month: int, date_issued_day: int,
                  expiration_date_year: int, expiration_date_month: int, expiration_date_day: int):
         self.owner_ID = owner_ID  # ID of the Customer object that was logged in upon creation.
@@ -25,6 +25,8 @@ class Prescription:
 
         # Random ID to discern between prescriptions with identical names, date, etc.
         self.ID = str(uuid.uuid4())
+        # Tracks when medication was last taken
+        self.was_taken = datetime.now()  # FIXME: Is it okay for the "timer" for the notification start at creation?
 
         # Dates are special.
         self.date_issued = datetime(date_issued_year, date_issued_month, date_issued_day)

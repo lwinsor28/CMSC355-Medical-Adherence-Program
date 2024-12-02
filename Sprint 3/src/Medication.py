@@ -159,6 +159,14 @@ class _MedicationInputParent:
         # Colors
         self.DARK_GREY = "#b3b3b3"
 
+        # Duration modifiers (for prescription_data.time_btwn_dose)
+        self.duration_mods = [
+            ["seconds", "minutes", "hours", "days", "weeks"],  # modifier names
+            [1, 60, 3600, 86400, 604800]  # seconds per mod
+        ]
+        self.selected_duration_mod = tk.StringVar()
+        self.selected_duration_mod.set(self.duration_mods[0][3])
+
         # Run all the functions that create the window
         self.init_root()
         self.init_frames()
@@ -210,7 +218,6 @@ class _MedicationInputParent:
             ("drug_name", "Prescription Name"),
             ("doctor", "Name of Prescriber"),
             ("dosage", "Dosage"),
-            ("time_btwn_dose", "Time Between Dose"),
             ("side_effects", "Side Effects")
         )
 
@@ -238,10 +245,28 @@ class _MedicationInputParent:
                 if item[0] == "drug_name":
                     entryBox["state"] = "disabled"
 
+        # Create time between dose entry box
+        anchor_row = self.TOP_ROW + len(items) + 1
+        tk.Label(self.main_frame, text="Time Between Dose").grid(
+            column=0, row=anchor_row,
+            columnspan=1, sticky="NSEW", padx=5, pady=5
+        )
+        tk.Entry(self.main_frame, textvariable=self.prescription_data["time_btwn_dose"]).grid(
+            column=1, row=anchor_row,
+            columnspan=self.COL_WIDTH - 2, sticky="NSEW", padx=10, pady=5
+        )
+        # Special duration selector
+        ttk.OptionMenu(self.main_frame, self.selected_duration_mod,
+                       self.selected_duration_mod.get(), *self.duration_mods[0]).grid(
+            column=self.COL_WIDTH - 1, row=anchor_row,
+            columnspan=1, rowspan=1,
+            padx=5, pady=5, sticky="NSEW"
+        )
+
         # Date inputs
         for idx in range(len(date_items)):
             item = date_items[idx]
-            anchor_row = self.TOP_ROW + len(items) + 1
+            anchor_row += 1
 
             # Set text box labels
             self.prescription_data[item[0]][0].set("MM")
@@ -267,15 +292,40 @@ class _MedicationInputParent:
                 )
 
         # Create done and cancel buttons
+        anchor_row += len(date_items)
         ttk.Button(self.main_frame, text="Cancel", command=self.root.destroy).grid(
-            column=self.COL_WIDTH - 2, row=self.TOP_ROW + len(items) + 3,
+            column=self.COL_WIDTH - 2, row=anchor_row,
             columnspan=1, sticky="SEW", padx=5, pady=8
         )
         self.done_button = ttk.Button(self.main_frame, text="Done", command=self.done_func)
         self.done_button.grid(
-            column=self.COL_WIDTH - 1, row=self.TOP_ROW + len(items) + 3,
+            column=self.COL_WIDTH - 1, row=anchor_row,
             columnspan=1, sticky="SEW", padx=5, pady=8
         )
+
+    def get_time_btwn_dose_from_entry(self) -> int:
+        """Convert time_between_dosage value into an integer number of seconds."""
+        time_btwn_dose = int(self.prescription_data["time_btwn_dose"].get()) * \
+                         self.duration_mods[1][self.duration_mods[0].index(self.selected_duration_mod.get())]
+        print(
+            f'Result {time_btwn_dose} / Original {self.prescription_data["time_btwn_dose"].get()} / Mod {self.duration_mods[1][self.duration_mods[0].index(self.selected_duration_mod.get())]}')
+        return time_btwn_dose
+
+    def get_plausible_duration_mod(self) -> str:
+        """Return a likely duration modifier for an existing time between dosage entry."""
+        try:
+            seconds = int(self.prescription_data["time_btwn_dose"].get())
+        except TypeError:
+            print("Bad int conversion with _MedicationInputParent.get_plausible_duration_mod in Medication.py."
+                  "Using seconds as default.")
+            return self.duration_mods[0][0]
+
+        # Loop through duration_mods and check if a clean division can be done. If so, use that duration mod.
+        for idx in reversed(range(len(self.duration_mods[0]))):
+            if (seconds % self.duration_mods[1][idx]) == 0:
+                return self.duration_mods[0][idx]
+        # Otherwise, just use seconds as a default if nothing sensible is found
+        return self.duration_mods[0][2]
 
 
 class AddMedicationWindow(_MedicationInputParent):
@@ -288,6 +338,7 @@ class AddMedicationWindow(_MedicationInputParent):
         validator = Validator()
         validator.check_dates_are_valid(self.prescription_data)
         validator.check_str_not_blank(self.prescription_data["drug_name"].get(), "Drug Name")
+        validator.check_can_be_int(self.prescription_data["time_btwn_dose"].get(), "Time Between Dose")
 
         if validator.no_failures():
             # Automatically add "mg" to dosage
@@ -300,7 +351,7 @@ class AddMedicationWindow(_MedicationInputParent):
                 self.current_user.get(),
                 self.prescription_data["drug_name"].get(),
                 self.prescription_data["doctor"].get(),
-                self.prescription_data["time_btwn_dose"].get(),
+                self.get_time_btwn_dose_from_entry(),
                 self.prescription_data["side_effects"].get(),
                 dosage,
                 int(self.prescription_data["date_issued"][2].get()),  # year
@@ -382,8 +433,9 @@ class EditMedicationWindow(_MedicationInputParent):
             if (prescription.owner_ID == self.current_user.get()) and (prescription.drug_name == self.selection.get()):
                 self.prescription_data["drug_name"].set(prescription.drug_name)
                 self.prescription_data["doctor"].set(prescription.doctor_name)
-                self.prescription_data["time_btwn_dose"].set(prescription.time_btwn_dose)
                 self.prescription_data["side_effects"].set(prescription.side_effects)
+                self.prescription_data["time_btwn_dose"].set(prescription.time_btwn_dose)
+                self.selected_duration_mod.set(self.get_plausible_duration_mod())
                 self.prescription_data["dosage"].set(prescription.dosage)
                 self.prescription_data["date_issued"][2].set(prescription.date_issued.year)  # year
                 self.prescription_data["date_issued"][0].set(prescription.date_issued.month)  # month
@@ -411,7 +463,7 @@ class EditMedicationWindow(_MedicationInputParent):
                 self.current_user.get(),
                 self.prescription_data["drug_name"].get(),
                 self.prescription_data["doctor"].get(),
-                self.prescription_data["time_btwn_dose"].get(),
+                self.get_time_btwn_dose_from_entry(),
                 self.prescription_data["side_effects"].get(),
                 self.prescription_data["dosage"].get(),
                 int(self.prescription_data["date_issued"][2].get()),  # year

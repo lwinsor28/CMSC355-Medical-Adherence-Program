@@ -19,8 +19,12 @@ Feel free to add a new validation function into the class if necessary.
 import re
 from datetime import datetime
 
-from src.Database import Database
-from src.Alert import AlertWindow
+try:
+    from src.Database import Database
+    from src.Alert import AlertWindow
+except ImportError:
+    from src.Database import Database
+    from src.Alert import AlertWindow
 
 
 class Validator:
@@ -185,6 +189,14 @@ class Validator:
         FAIL_MESSAGE = f"{field_name.title()} cannot be blank."
 
         if (input_str is None) or (input_str == ""):
+            self._add_failure(FAIL_MESSAGE)
+
+    def check_can_be_int(self, input_str: str, field_name: str) -> None:
+        """Checks a string to make sure it can be converted to an integer."""
+        FAIL_MESSAGE = f"{field_name} must be a number." \
+                       f"Please remove any non-numeric characters from \"{input_str}\"."
+
+        if not input_str.isdigit():
             self._add_failure(FAIL_MESSAGE)
 
     def check_user_has_prescriptions(self, user_id: str, database: Database) -> None:
