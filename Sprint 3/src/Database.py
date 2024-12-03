@@ -10,9 +10,11 @@ import pickle
 try:
     from src.Customer import Customer
     from src.Prescription import Prescription
+    import src.Notification
 except ImportError:
     from Customer import Customer
     from Prescription import Prescription
+    import Notification
 
 
 class Database:
@@ -89,6 +91,10 @@ class Database:
                 self.prescriptions.pop(idx)
                 break
 
+    def notification_routine(self) -> None:
+        """Will check database for medications that need to be taken and send the necessary notifications."""
+
+
     # SAVING METHODS -----
     def save_customers(self) -> None:
         """Save customers list to disk"""
@@ -134,11 +140,15 @@ class Database:
 
     def load_default_prescriptions(self) -> None:
         """Loads 2 default prescriptions for default user `Satoru`.
-        Note, this leaves the 2nd default user `Sukuna` without prescriptions on purpose for testing."""
+        Note, this leaves the 2nd default user `Sukuna` without prescriptions on purpose for testing.
+
+        NOTE: Needs default user `Satoru` to be in the database. Thus, this should only be run once default
+        users are loaded.
+        """
         gojo = self.get_customer_by_username_password("thestr0ngest", "hollow&purple1989")
-        self.add_prescription(gojo.ID, "Copium", "Gege Akutami", "1 week", "Sudden torso separation.",
+        self.add_prescription(gojo.ID, "Copium", "Gege Akutami", "604800", "Sudden torso separation.",
                               "500mg", 2023, 9, 25, 2024, 9, 29)
-        self.add_prescription(gojo.ID, "Reverse Cursed Technique", "Ieiri Shoko", "2 minutes",
+        self.add_prescription(gojo.ID, "Reverse Cursed Technique", "Ieiri Shoko", "120",
                               "Temporary loss of mental faculties.", "5kg",
                               2019, 9, 9, 2024, 9, 29)
 

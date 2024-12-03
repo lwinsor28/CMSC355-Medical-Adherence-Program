@@ -194,7 +194,7 @@ class Validator:
     def check_can_be_int(self, input_str: str, field_name: str) -> None:
         """Checks a string to make sure it can be converted to an integer."""
         FAIL_MESSAGE = f"{field_name} must be a number." \
-                       f"Please remove any non-numeric characters from \"{input_str}\"."
+                       f"\nPlease remove any non-numeric characters from \"{input_str}\"."
 
         if not input_str.isdigit():
             self._add_failure(FAIL_MESSAGE)

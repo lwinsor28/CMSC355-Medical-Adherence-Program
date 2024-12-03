@@ -305,27 +305,28 @@ class _MedicationInputParent:
 
     def get_time_btwn_dose_from_entry(self) -> int:
         """Convert time_between_dosage value into an integer number of seconds."""
-        time_btwn_dose = int(self.prescription_data["time_btwn_dose"].get()) * \
-                         self.duration_mods[1][self.duration_mods[0].index(self.selected_duration_mod.get())]
+        time_btwn_dose = int(int(self.prescription_data["time_btwn_dose"].get()) *
+                         self.duration_mods[1][self.duration_mods[0].index(self.selected_duration_mod.get())])
         print(
             f'Result {time_btwn_dose} / Original {self.prescription_data["time_btwn_dose"].get()} / Mod {self.duration_mods[1][self.duration_mods[0].index(self.selected_duration_mod.get())]}')
         return time_btwn_dose
 
-    def get_plausible_duration_mod(self) -> str:
-        """Return a likely duration modifier for an existing time between dosage entry."""
+    def get_time_btwn_dose_info(self, time_btwn_dose: str) -> tuple:
+        """Returns (1) the time between dosage adjusted for the determined duration mod and
+        (2) the duration mod string."""
         try:
-            seconds = int(self.prescription_data["time_btwn_dose"].get())
-        except TypeError:
-            print("Bad int conversion with _MedicationInputParent.get_plausible_duration_mod in Medication.py."
-                  "Using seconds as default.")
-            return self.duration_mods[0][0]
+            seconds = int(time_btwn_dose)
+        except ValueError:
+            print("Bad int conversion with _MedicationInputParent.get_plausible_duration_mod in Medication.py. "
+                  f'Using seconds as default.\nValue: "{self.prescription_data["time_btwn_dose"].get()}"')
+            return -1, self.duration_mods[0][0]
 
         # Loop through duration_mods and check if a clean division can be done. If so, use that duration mod.
         for idx in reversed(range(len(self.duration_mods[0]))):
-            if (seconds % self.duration_mods[1][idx]) == 0:
-                return self.duration_mods[0][idx]
+            if (seconds % int(self.duration_mods[1][idx])) == 0:
+                return seconds // self.duration_mods[1][idx], self.duration_mods[0][idx]
         # Otherwise, just use seconds as a default if nothing sensible is found
-        return self.duration_mods[0][2]
+        return seconds // self.duration_mods[1][0], self.duration_mods[0][0]
 
 
 class AddMedicationWindow(_MedicationInputParent):
@@ -434,8 +435,6 @@ class EditMedicationWindow(_MedicationInputParent):
                 self.prescription_data["drug_name"].set(prescription.drug_name)
                 self.prescription_data["doctor"].set(prescription.doctor_name)
                 self.prescription_data["side_effects"].set(prescription.side_effects)
-                self.prescription_data["time_btwn_dose"].set(prescription.time_btwn_dose)
-                self.selected_duration_mod.set(self.get_plausible_duration_mod())
                 self.prescription_data["dosage"].set(prescription.dosage)
                 self.prescription_data["date_issued"][2].set(prescription.date_issued.year)  # year
                 self.prescription_data["date_issued"][0].set(prescription.date_issued.month)  # month
@@ -443,6 +442,11 @@ class EditMedicationWindow(_MedicationInputParent):
                 self.prescription_data["expiration_date"][2].set(prescription.expiration_date.year)  # year
                 self.prescription_data["expiration_date"][0].set(prescription.expiration_date.month)  # month
                 self.prescription_data["expiration_date"][1].set(prescription.expiration_date.day)  # day
+
+                # Set time between dose and duration mod combobox
+                info = self.get_time_btwn_dose_info(prescription.time_btwn_dose)
+                self.prescription_data["time_btwn_dose"].set(info[0])
+                self.selected_duration_mod.set(info[1])
                 break
 
     def click_done_button(self, e=None):
@@ -450,6 +454,7 @@ class EditMedicationWindow(_MedicationInputParent):
         validator = Validator()
         validator.check_dates_are_valid(self.prescription_data)
         validator.check_str_not_blank(self.prescription_data["drug_name"].get(), "Drug Name")
+        validator.check_can_be_int(self.prescription_data["time_btwn_dose"].get(), "Time Between Dose")
 
         if validator.no_failures():
             # Delete the old prescription
