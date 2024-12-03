@@ -10,11 +10,11 @@ import pickle
 try:
     from src.Customer import Customer
     from src.Prescription import Prescription
-    import src.Notification
+    import src.Notification as Notification
 except ImportError:
     from Customer import Customer
     from Prescription import Prescription
-    import Notification
+    import Notification as Notification
 
 
 class Database:
@@ -92,8 +92,10 @@ class Database:
                 break
 
     def notification_routine(self) -> None:
-        """Will check database for medications that need to be taken and send the necessary notifications."""
-
+        """Checks database for medications that need to be taken and send the necessary notifications."""
+        queue = Notification.check(self)
+        for prescription in queue:
+            Notification.send(prescription)
 
     # SAVING METHODS -----
     def save_customers(self) -> None:

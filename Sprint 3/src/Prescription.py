@@ -19,7 +19,7 @@ class Prescription:
         self.owner_ID = owner_ID  # ID of the Customer object that was logged in upon creation.
         self.drug_name = drug_name
         self.doctor_name = doctor_name
-        self.time_btwn_dose = time_btwn_dose
+        self.time_btwn_dose = time_btwn_dose  # stored in seconds
         self.side_effects = side_effects
         self.dosage = dosage
 

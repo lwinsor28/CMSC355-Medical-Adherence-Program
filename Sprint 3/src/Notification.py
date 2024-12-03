@@ -5,18 +5,26 @@ Description: Holds a wrapper function that sends the medication reminder notific
 
 from windows_toasts import WindowsToaster, ToastDisplayImage, ToastAudio, AudioSource, Toast
 from os import path
+from datetime import datetime
 
 try:
     from src.Prescription import Prescription
 except ImportError:
     from Prescription import Prescription
 
-ICO_PATH = path.abspath("../assets/medical_icon.png")
+ICO_PATH = path.abspath("./assets/medical_icon.png")
 
 
-def check(database) -> tuple[Prescription]:
+def check(database) -> list[Prescription]:
     """Takes a database and returns a tuple of prescriptions that need to have a notification sent out."""
-    pass
+    result = []
+    for p in database.prescriptions:
+        delta = datetime.now() - p.was_taken
+        delta = delta.seconds
+        if delta >= int(p.time_btwn_dose):
+            result.append(p)
+
+    return result
 
 
 def send(prescription: Prescription) -> None:
@@ -34,8 +42,19 @@ def send(prescription: Prescription) -> None:
 
 
 if __name__ == "__main__":
+    try:
+        from src.Database import Database
+    except ImportError:
+        from Database import Database
+
+    ICO_PATH = path.abspath("../assets/medical_icon.png")
     db = Database()
     db.load_default_customers()
     db.load_default_prescriptions()
 
-    send(db.prescriptions[0])
+    #send(db.prescriptions[0])
+
+    print("Queue:")
+    queue = check(db)
+    for prescription in queue:
+        print(f"\t{prescription.drug_name} / {prescription.ID}")

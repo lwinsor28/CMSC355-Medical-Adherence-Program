@@ -48,6 +48,7 @@ class App:
         self.current_user.set(NO_USER_MSG)
         self.current_user_info = tk.StringVar()  # Stores a string that displays all user info to show who is logged in.
         self.current_user_info.set(NO_USER_MSG)
+        self.notification_bg_task()
 
         # Load any necessary components
         self.init_root()
@@ -150,3 +151,14 @@ class App:
 
         # Put window focus on main menu
         self.root.focus()
+
+    def notification_bg_task(self):
+        """Runs a check on the database to see if any notifications need to be sent out.
+        After sending any necessary notifications, this function is schedules to run again in 1 minute
+        (as per the business rules)."""
+
+        print("Checking for notifications...")
+        self.database.notification_routine()
+
+        #self.root.after(60000, self.notification_bg_task) use this before submitting final project (1 min delay)
+        self.root.after(6000, self.notification_bg_task)
