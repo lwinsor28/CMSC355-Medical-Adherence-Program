@@ -26,7 +26,9 @@ class Prescription:
         # Random ID to discern between prescriptions with identical names, date, etc.
         self.ID = str(uuid.uuid4())
         # Tracks when medication was last taken
-        self.was_taken = datetime.now()  # FIXME: Is it okay for the "timer" for the notification start at creation?
+        self.was_taken = datetime.now()
+        # Counts amount of time to delay notifications due to snoozing requested by the user
+        self.snooze = 0
 
         # Dates are special.
         self.date_issued = datetime(date_issued_year, date_issued_month, date_issued_day)

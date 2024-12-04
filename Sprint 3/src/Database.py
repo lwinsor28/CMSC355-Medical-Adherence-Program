@@ -91,11 +91,11 @@ class Database:
                 self.prescriptions.pop(idx)
                 break
 
-    def notification_routine(self) -> None:
+    def notification_routine(self, current_user) -> None:
         """Checks database for medications that need to be taken and send the necessary notifications."""
         queue = Notification.check(self)
         for prescription in queue:
-            Notification.send(prescription)
+            Notification.send(self, prescription, current_user)
 
     # SAVING METHODS -----
     def save_customers(self) -> None:
@@ -150,9 +150,12 @@ class Database:
         gojo = self.get_customer_by_username_password("thestr0ngest", "hollow&purple1989")
         self.add_prescription(gojo.ID, "Copium", "Gege Akutami", "604800", "Sudden torso separation.",
                               "500mg", 2023, 9, 25, 2024, 9, 29)
-        self.add_prescription(gojo.ID, "Reverse Cursed Technique", "Ieiri Shoko", "120",
-                              "Temporary loss of mental faculties.", "5kg",
+        self.add_prescription(gojo.ID, "Reverse Cursed Technique", "Ieiri Shoko", "20",
+                              "Temporary loss of mental faculties.", "5000mg",
                               2019, 9, 9, 2024, 9, 29)
+        """self.add_prescription(gojo.ID, "Six Eyes", "The Universe", "30",
+                              "Extreme exhaustion", "0mg",
+                              1989, 9, 9, 2024, 9, 29)"""
 
     def __str__(self):
         result = "Customers (" + str(len(self.customers)) + ") " + "-" * 10 + "\n"

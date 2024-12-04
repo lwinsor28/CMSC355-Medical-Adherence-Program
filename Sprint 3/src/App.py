@@ -158,7 +158,6 @@ class App:
         (as per the business rules)."""
 
         print("Checking for notifications...")
-        self.database.notification_routine()
+        self.database.notification_routine(self.current_user)
 
-        #self.root.after(60000, self.notification_bg_task) use this before submitting final project (1 min delay)
         self.root.after(6000, self.notification_bg_task)
