@@ -18,8 +18,9 @@ This repo contains code for a medical adherence software. This software will tra
 * Run `main.py`
 
 ### Requirements
-* Tested by one member with **Python 3.11**
-* Tested by one member with **Python 3.12**
+* Windows OS
+  * Notifications are not implemented to work with Linux/macOS
+* Tested with **Python 3.11 and 3.12**
 
 ### Sprint 1 Demo Images
 ![New Account Window](./Sprint%201/assets/demo1.png)
