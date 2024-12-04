@@ -18,12 +18,14 @@ try:
     from src.Database import Database
     from src.Medication import MedicationMenuWindow
     from src.Validator import Validator
+    import src.Notification as Notification
 except ImportError:
     from Account import SignupWindow, LoginWindow
     from Alert import AlertWindow
     from Database import Database
     from Medication import MedicationMenuWindow
     from Validator import Validator
+    import Notification as Notification
 
 NO_USER_MSG = "No User Signed In"
 
@@ -154,10 +156,12 @@ class App:
 
     def notification_bg_task(self):
         """Runs a check on the database to see if any notifications need to be sent out.
-        After sending any necessary notifications, this function is schedules to run again in 1 minute
+        After sending any necessary notifications, this function is scheduled to run again in 1 minute
         (as per the business rules)."""
+        ONE_MINUTE_IN_MS = 60000
 
-        print("Checking for notifications...")
-        self.database.notification_routine(self.current_user)
+        queue = Notification.check(self.database)
+        for prescription in queue:
+            Notification.send(self.database, prescription, self.current_user)
 
-        self.root.after(6000, self.notification_bg_task)
+        self.root.after(ONE_MINUTE_IN_MS, self.notification_bg_task)

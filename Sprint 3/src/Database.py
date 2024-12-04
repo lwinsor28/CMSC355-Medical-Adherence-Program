@@ -10,11 +10,9 @@ import pickle
 try:
     from src.Customer import Customer
     from src.Prescription import Prescription
-    import src.Notification as Notification
 except ImportError:
     from Customer import Customer
     from Prescription import Prescription
-    import Notification as Notification
 
 
 class Database:
@@ -91,12 +89,6 @@ class Database:
                 self.prescriptions.pop(idx)
                 break
 
-    def notification_routine(self, current_user) -> None:
-        """Checks database for medications that need to be taken and send the necessary notifications."""
-        queue = Notification.check(self)
-        for prescription in queue:
-            Notification.send(self, prescription, current_user)
-
     # SAVING METHODS -----
     def save_customers(self) -> None:
         """Save customers list to disk"""
@@ -150,10 +142,10 @@ class Database:
         gojo = self.get_customer_by_username_password("thestr0ngest", "hollow&purple1989")
         self.add_prescription(gojo.ID, "Copium", "Gege Akutami", "604800", "Sudden torso separation.",
                               "500mg", 2023, 9, 25, 2024, 9, 29)
-        self.add_prescription(gojo.ID, "Reverse Cursed Technique", "Ieiri Shoko", "20",
+        self.add_prescription(gojo.ID, "Reverse Cursed Technique", "Ieiri Shoko", "120",
                               "Temporary loss of mental faculties.", "5000mg",
                               2019, 9, 9, 2024, 9, 29)
-        """self.add_prescription(gojo.ID, "Six Eyes", "The Universe", "30",
+        """self.add_prescription(gojo.ID, "Six Eyes", "The Universe", "10",
                               "Extreme exhaustion", "0mg",
                               1989, 9, 9, 2024, 9, 29)"""
 

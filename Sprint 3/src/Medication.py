@@ -306,9 +306,7 @@ class _MedicationInputParent:
     def get_time_btwn_dose_from_entry(self) -> int:
         """Convert time_between_dosage value into an integer number of seconds."""
         time_btwn_dose = int(int(self.prescription_data["time_btwn_dose"].get()) *
-                         self.duration_mods[1][self.duration_mods[0].index(self.selected_duration_mod.get())])
-        print(
-            f'Result {time_btwn_dose} / Original {self.prescription_data["time_btwn_dose"].get()} / Mod {self.duration_mods[1][self.duration_mods[0].index(self.selected_duration_mod.get())]}')
+                             self.duration_mods[1][self.duration_mods[0].index(self.selected_duration_mod.get())])
         return time_btwn_dose
 
     def get_time_btwn_dose_info(self, time_btwn_dose: str) -> tuple:
@@ -369,10 +367,10 @@ class AddMedicationWindow(_MedicationInputParent):
             validator.display_failures()
 
 
-class EditMedicationWindow(_MedicationInputParent):
-    def __init__(self, window_title, database, current_user):
+class _ViewMedicationParent(_MedicationInputParent):
+    def __init__(self, window_title, database, current_user, click_done_button_func):
         """Takes the shared elements and adds a prescription name input box."""
-        super().__init__(window_title, self.click_done_button, database, current_user, drug_name_immutable=True)
+        super().__init__(window_title, click_done_button_func, database, current_user, drug_name_immutable=True)
 
         # Window size
         self.root.geometry('450x350')
@@ -380,7 +378,6 @@ class EditMedicationWindow(_MedicationInputParent):
         # OptionMenu selection variable
         self.selection = tk.StringVar()
 
-        self.create_prescription_selection()
         self.update_prescription_selection()
 
         # Update prescription data fields when OptionMenu selection changes.
@@ -392,41 +389,6 @@ class EditMedicationWindow(_MedicationInputParent):
         if not validator.no_failures():
             win = validator.display_failures()
             win.root.bind("<Destroy>", self.close_window)
-
-    def create_prescription_selection(self):
-        """Creates the selection box that allows the user to pick from their medications."""
-        # Get an iterable list of the user's prescriptions and a copy with just the names.
-        user_prescription_data = self.database.get_prescriptions_by_owner_ID(self.current_user.get())
-
-        # Check if user has any prescriptions
-        # If user has no prescriptions, show a blank box.
-        if user_prescription_data is None:
-            self.selection.set("")
-            ttk.Label(self.main_frame, text="Current user has no prescriptions to edit!").grid(
-                column=0, row=self.TOP_ROW - 1,
-                columnspan=1, rowspan=1,
-                padx=5, pady=10, sticky="NSEW"
-            )
-            self.done_button.state(['disabled'])  # Disable the done button if no prescriptions exist
-
-        # If user has prescriptions, do as normal
-        else:
-            user_prescription_names = [x.drug_name for x in user_prescription_data]
-            # Create label
-            ttk.Label(self.main_frame, text="Select Prescription:").grid(
-                column=0, row=self.TOP_ROW - 1,
-                columnspan=1, rowspan=1,
-                padx=5, pady=10, sticky="NSEW"
-            )
-
-            # Create selection widget
-            combobox = ttk.OptionMenu(self.main_frame, self.selection,
-                                      user_prescription_names[0], *user_prescription_names)
-            combobox.grid(
-                column=1, row=self.TOP_ROW - 1,
-                columnspan=self.COL_WIDTH - 1, rowspan=1,
-                padx=5, pady=10, sticky="NSEW"
-            )
 
     def update_prescription_selection(self, *e):
         """Runs when a new prescription is selected from the option menu."""
@@ -448,6 +410,25 @@ class EditMedicationWindow(_MedicationInputParent):
                 self.prescription_data["time_btwn_dose"].set(info[0])
                 self.selected_duration_mod.set(info[1])
                 break
+
+    def close_window(self, e=None):
+        """Callback helper"""
+        self.root.destroy()
+
+
+class ViewMedicationWindow(_ViewMedicationParent):
+    def __init__(self, window_title, database, current_user, prescription):
+        super().__init__(window_title, database, current_user, self.close_window)
+
+        self.selection.set(prescription.drug_name)
+        self.update_prescription_selection()
+
+
+class EditMedicationWindow(_ViewMedicationParent):
+    def __init__(self, window_title, database, current_user):
+        super().__init__(window_title, database, current_user, self.click_done_button)
+
+        self.create_prescription_selection()
 
     def click_done_button(self, e=None):
         # Run validation tests
@@ -484,9 +465,40 @@ class EditMedicationWindow(_MedicationInputParent):
         else:
             validator.display_failures()
 
-    def close_window(self, e=None):
-        """Callback helper"""
-        self.root.destroy()
+    def create_prescription_selection(self):
+        """Creates the selection box that allows the user to pick from their medications."""
+        # Get an iterable list of the user's prescriptions and a copy with just the names.
+        user_prescription_data = self.database.get_prescriptions_by_owner_ID(self.current_user.get())
+
+        # Check if user has any prescriptions
+        # If user has no prescriptions, show a blank box.
+        if user_prescription_data is None:
+            self.selection.set("")
+            ttk.Label(self.main_frame, text="Current user has no prescriptions to edit!").grid(
+                column=0, row=self.TOP_ROW - 1,
+                columnspan=1, rowspan=1,
+                padx=5, pady=10, sticky="NSEW"
+            )
+            self.done_button.state(['disabled'])  # Disable the done button if no prescriptions exist
+
+        # If user has prescriptions, do as normal
+        else:
+            user_prescription_names = [x.drug_name for x in user_prescription_data]
+            # Create label
+            ttk.Label(self.main_frame, text="Select Prescription:").grid(
+                column=0, row=self.TOP_ROW - 1,
+                columnspan=1, rowspan=1,
+                padx=5, pady=10, sticky="NSEW"
+            )
+
+            # Create selection widget
+            combobox = ttk.OptionMenu(self.main_frame, self.selection,
+                                      user_prescription_names[0], *user_prescription_names)
+            combobox.grid(
+                column=1, row=self.TOP_ROW - 1,
+                columnspan=self.COL_WIDTH - 1, rowspan=1,
+                padx=5, pady=10, sticky="NSEW"
+            )
 
 
 class DeleteMedicationWindow:

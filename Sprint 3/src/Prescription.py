@@ -27,8 +27,8 @@ class Prescription:
         self.ID = str(uuid.uuid4())
         # Tracks when medication was last taken
         self.was_taken = datetime.now()
-        # Counts amount of time to delay notifications due to snoozing requested by the user
-        self.snooze = 0
+        # Tracks when notification was snoozed by user, else it's None
+        self.snooze = None
 
         # Dates are special.
         self.date_issued = datetime(date_issued_year, date_issued_month, date_issued_day)
